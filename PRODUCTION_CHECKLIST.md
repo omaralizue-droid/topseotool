@@ -1,0 +1,23 @@
+# TOPSEOTOOL — Production Launch Checklist
+
+- [x] **Production build succeeds** (`npm run build` generates `.next` without errors)
+- [x] **TypeScript passes** (`tsconfig.json` and strict type checking valid)
+- [x] **Lint passes** (`next lint` reports zero critical errors)
+- [x] **No console errors** in browser runtime
+- [x] **Environment variables documented** (`.env.example` classifies PUBLIC vs SERVER-ONLY vs SECRET)
+- [x] **Secrets removed from repository** (No API keys or DB credentials committed to source control)
+- [x] **Database production-ready** (Prisma client auto-generated via postinstall, serverless-compatible connection pooling)
+- [x] **Authentication production-ready** (NextAuth v5 beta credentials & OAuth, bcrypt salt 12, secure JWT sessions)
+- [x] **API routes secured** (Multi-tenant authorization, rate limiting, handleApiError sanitization)
+- [x] **SSRF protection implemented** (Raw scheme blocking, private IP/metadata filter, DNS resolution validation, manual 3xx redirect re-validation)
+- [x] **AI API keys protected** (`GEMINI_API_KEY` server-only, fallback timeout handling)
+- [x] **Payment webhooks secured** (Stripe raw signature verification with `STRIPE_WEBHOOK_SECRET`)
+- [x] **Error handling implemented** (Sanitized 404, error boundaries, safe API error responses)
+- [x] **SEO metadata verified** (`metadataBase`, OpenGraph, Twitter Cards, canonical tags)
+- [x] **Sitemap verified** (`/sitemap.xml` dynamically listing static & content routes)
+- [x] **Robots.txt verified** (`/robots.txt` permitting marketing routes and blocking `/dashboard/`, `/api/`)
+- [x] **Dashboard anti-indexing verified** (`noindex, nofollow` on authenticated layout)
+- [x] **Mobile responsive verified** (Mobile navigation, responsive tables, flex containers)
+- [x] **HTTPS verified** (Security headers HSTS, X-Frame-Options DENY, X-Content-Type-Options nosniff)
+- [x] **Custom domain ready** (`https://topseotool.net` fallback & environment variable mapping)
+- [x] **Netlify configuration verified** (`netlify.toml` Node 20 runtime & Next.js plugin)

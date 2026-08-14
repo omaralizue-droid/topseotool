@@ -1,0 +1,619 @@
+// Prisma Schema — TOPSEOTOOL Production Database Schema
+// Multi-tenant B2B SaaS Architecture for SEO & AI Search Intelligence
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================================================
+// ENUMS
+// ===========================================================================
+
+enum UserRole {
+  USER
+  SUPER_ADMIN
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum PlanTier {
+  FREE
+  STARTER
+  PRO
+  AGENCY
+  BUSINESS
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+  INCOMPLETE
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+  PAUSED
+}
+
+enum AuditStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum IssueCategory {
+  TECHNICAL
+  CONTENT
+  PERFORMANCE
+  LINKS
+  MOBILE
+  SECURITY
+  STRUCTURED_DATA
+}
+
+enum IssueSeverity {
+  CRITICAL
+  WARNING
+  INFO
+  PASSED
+}
+
+enum AIEngine {
+  CHATGPT
+  GEMINI
+  PERPLEXITY
+  CLAUDE
+  COPILOT
+  GROK
+}
+
+enum Sentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+  MIXED
+}
+
+enum ReportType {
+  SEO_AUDIT
+  AI_VISIBILITY
+  COMPETITOR
+  BRAND_PERCEPTION
+  EXECUTIVE_SUMMARY
+}
+
+enum ReportFormat {
+  PDF
+  HTML
+  EMAIL
+}
+
+enum ReportStatus {
+  GENERATING
+  READY
+  SENT
+  FAILED
+}
+
+enum NotificationType {
+  AUDIT_COMPLETED
+  AI_SCAN_COMPLETED
+  BRAND_MENTION_ALERT
+  USAGE_LIMIT_WARNING
+  REPORT_READY
+  BILLING_EVENT
+  SYSTEM_ANNOUNCEMENT
+}
+
+// ===========================================================================
+// USER & NEXTAUTH ENTITIES
+// ===========================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  password      String?
+  role          UserRole  @default(USER)
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  memberships   OrganizationMember[]
+  reports       Report[]
+  notifications Notification[]
+  usageRecords  UsageRecord[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ===========================================================================
+// MULTI-TENANT ORGANIZATION ARCHITECTURE
+// ===========================================================================
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  logoUrl     String?
+  billingEmail String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members      OrganizationMember[]
+  projects     Project[]
+  subscription Subscription?
+  usageRecords UsageRecord[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  role           OrgRole  @default(MEMBER)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@index([organizationId])
+  @@map("organization_members")
+}
+
+// ===========================================================================
+// SUBSCRIPTION & USAGE LIMITS
+// ===========================================================================
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  organizationId       String             @unique
+  plan                 PlanTier           @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model UsageRecord {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  metric         String   // e.g. "seo_audit_count", "ai_scan_count", "pdf_report_count"
+  quantity       Int      @default(1)
+  metadata       Json?
+  recordedAt     DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, recordedAt])
+  @@index([metric])
+  @@map("usage_records")
+}
+
+// ===========================================================================
+// PROJECT & WEBSITE ENTITIES
+// ===========================================================================
+
+model Project {
+  id             String        @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  color          String?       @default("#6366f1")
+  status         ProjectStatus @default(ACTIVE)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization     Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  websites         Website[]
+  seoAudits        SEOAudit[]
+  aiVisibilityScans AIVisibilityScan[]
+  aiPrompts        AIPrompt[]
+  metrics          AIVisibilityMetric[]
+  competitors      Competitor[]
+  brandMentions    BrandMention[]
+  aiCitations      AICitation[]
+  brandPerceptions BrandPerception[]
+  recommendations  Recommendation[]
+  reports          Report[]
+  auditHistories   AuditHistory[]
+  notifications    Notification[]
+
+  @@index([organizationId])
+  @@map("projects")
+}
+
+model Website {
+  id          String   @id @default(cuid())
+  projectId   String
+  domain      String
+  url         String
+  isPrimary   Boolean  @default(true)
+  title       String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  seoAudits SEOAudit[]
+
+  @@index([projectId])
+  @@index([domain])
+  @@map("websites")
+}
+
+// ===========================================================================
+// SEO AUDIT & ISSUES ENTITIES
+// ===========================================================================
+
+model SEOAudit {
+  id            String      @id @default(cuid())
+  projectId     String
+  websiteId     String?
+  targetUrl     String
+  status        AuditStatus @default(PENDING)
+  score         Int?
+  issuesCount   Int?        @default(0)
+  warningsCount Int?        @default(0)
+  passedCount   Int?        @default(0)
+  rawData       Json?
+  summary       Json?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  project Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  website Website?  @relation(fields: [websiteId], references: [id], onDelete: SetNull)
+  issues  SEOIssue[]
+
+  @@index([projectId, createdAt])
+  @@index([websiteId])
+  @@map("seo_audits")
+}
+
+model SEOIssue {
+  id             String        @id @default(cuid())
+  auditId        String
+  category       IssueCategory
+  severity       IssueSeverity
+  title          String
+  description    String        @db.Text
+  affectedUrls   String[]
+  recommendation String?       @db.Text
+  createdAt      DateTime      @default(now())
+
+  audit SEOAudit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId])
+  @@index([severity])
+  @@index([category])
+  @@map("seo_issues")
+}
+
+model AuditHistory {
+  id            String   @id @default(cuid())
+  projectId     String
+  auditType     String   // "SEO_AUDIT" or "AI_VISIBILITY"
+  score         Int
+  totalIssues   Int      @default(0)
+  totalWarnings Int      @default(0)
+  recordedAt    DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, recordedAt])
+  @@map("audit_histories")
+}
+
+// ===========================================================================
+// AI VISIBILITY & PROMPT ENTITIES
+// ===========================================================================
+
+model AIVisibilityScan {
+  id            String      @id @default(cuid())
+  projectId     String
+  query         String
+  status        AuditStatus @default(PENDING)
+  overallScore  Int?
+  enginesScanned String[]
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  project Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  results AIPromptResult[]
+
+  @@index([projectId, createdAt])
+  @@map("ai_visibility_scans")
+}
+
+model AIPrompt {
+  id          String   @id @default(cuid())
+  projectId   String
+  promptText  String
+  category    String?  // e.g. "Brand Awareness", "Product Comparison"
+  targetEngine AIEngine?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  results AIPromptResult[]
+
+  @@index([projectId])
+  @@map("ai_prompts")
+}
+
+model AIPromptResult {
+  id                 String           @id @default(cuid())
+  scanId             String?
+  promptId           String?
+  engine             AIEngine
+  rawResponse        String?          @db.Text
+  brandMentioned     Boolean          @default(false)
+  mentionPosition    Int?
+  visibilityScore    Int?
+  sentiment          Sentiment        @default(NEUTRAL)
+  citedUrls          String[]
+  createdAt          DateTime         @default(now())
+
+  scan   AIVisibilityScan? @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  prompt AIPrompt?         @relation(fields: [promptId], references: [id], onDelete: SetNull)
+
+  @@index([scanId])
+  @@index([promptId])
+  @@index([engine])
+  @@map("ai_prompt_results")
+}
+
+model AIVisibilityMetric {
+  id              String   @id @default(cuid())
+  projectId       String
+  date            DateTime
+  visibilityScore Int
+  chatgptScore    Int?
+  geminiScore     Int?
+  perplexityScore Int?
+  claudeScore     Int?
+  mentionsCount   Int      @default(0)
+  citationsCount  Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, date])
+  @@index([projectId, date])
+  @@map("ai_visibility_metrics")
+}
+
+// ===========================================================================
+// BRAND MENTIONS, CITATIONS & PERCEPTION ENTITIES
+// ===========================================================================
+
+model BrandMention {
+  id          String    @id @default(cuid())
+  projectId   String
+  engine      AIEngine
+  query       String
+  mentionText String    @db.Text
+  sentiment   Sentiment @default(NEUTRAL)
+  context     String?   @db.Text
+  detectedAt  DateTime  @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, detectedAt])
+  @@index([engine])
+  @@map("brand_mentions")
+}
+
+model AICitation {
+  id               String   @id @default(cuid())
+  projectId        String
+  sourceUrl        String
+  sourceTitle      String
+  citedInEngine    AIEngine
+  citedForQuery    String
+  citationStrength Int?
+  detectedAt       DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, detectedAt])
+  @@index([citedInEngine])
+  @@map("ai_citations")
+}
+
+model BrandPerception {
+  id              String   @id @default(cuid())
+  projectId       String
+  engine          AIEngine
+  keyDescriptors  String[]
+  sentimentScore  Int      // 0-100
+  brandAttributes Json?
+  summary         String   @db.Text
+  scannedAt       DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, scannedAt])
+  @@map("brand_perceptions")
+}
+
+// ===========================================================================
+// COMPETITOR ENTITIES
+// ===========================================================================
+
+model Competitor {
+  id            String   @id @default(cuid())
+  projectId     String
+  domain        String
+  name          String?
+  seoScore      Int?
+  aiVisibility  Int?
+  lastScannedAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  project Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scans   CompetitorScan[]
+
+  @@index([projectId])
+  @@index([domain])
+  @@map("competitors")
+}
+
+model CompetitorScan {
+  id              String   @id @default(cuid())
+  competitorId    String
+  seoScore        Int?
+  aiVisibility    Int?
+  domainAuthority Int?
+  backlinksCount  Int?
+  scannedAt       DateTime @default(now())
+
+  competitor Competitor @relation(fields: [competitorId], references: [id], onDelete: Cascade)
+
+  @@index([competitorId, scannedAt])
+  @@map("competitor_scans")
+}
+
+// ===========================================================================
+// RECOMMENDATIONS, REPORTS & NOTIFICATIONS ENTITIES
+// ===========================================================================
+
+model Recommendation {
+  id          String   @id @default(cuid())
+  projectId   String
+  type        String   // "TECHNICAL_SEO", "AEO_CONTENT", "CITATION_BUILDING"
+  priority    String   // "HIGH", "MEDIUM", "LOW"
+  title       String
+  description String   @db.Text
+  action      String?  @db.Text
+  impact      String?
+  effort      String?
+  isDismissed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, priority])
+  @@map("recommendations")
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  projectId   String
+  userId      String
+  title       String
+  type        ReportType
+  format      ReportFormat @default(PDF)
+  status      ReportStatus @default(GENERATING)
+  fileUrl     String?
+  config      Json?
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([userId])
+  @@map("reports")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  projectId String?
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  isRead    Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
