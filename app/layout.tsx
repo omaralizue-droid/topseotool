@@ -4,10 +4,21 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/components/query-provider";
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://topseotool.net"
+function getValidBaseUrl(): URL {
+  const raw = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") || "https://topseotool.net";
+  try {
+    const formatted = raw.startsWith("http://") || raw.startsWith("https://") ? raw : `https://${raw}`;
+    return new URL(formatted);
+  } catch {
+    return new URL("https://topseotool.net");
+  }
+}
+
+const metadataBaseUrl = getValidBaseUrl();
+const baseUrl = metadataBaseUrl.origin;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(baseUrl),
+  metadataBase: metadataBaseUrl,
   title: {
     default: "TOPSEOTOOL — AI Search & SEO Intelligence Platform",
     template: "%s | TOPSEOTOOL",

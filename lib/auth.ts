@@ -14,7 +14,9 @@ const loginSchema = z.object({
 import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth";
 
 const nextAuthInstance = NextAuth({
-  adapter: PrismaAdapter(db),
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "default_auth_secret_for_topseotool_dev_32chars_long",
+  trustHost: true,
+  ...(process.env.DATABASE_URL ? { adapter: PrismaAdapter(db) } : {}),
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
