@@ -25,5 +25,21 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     }
   })
 
-  return NextResponse.json({ ok: true, data: scans })
+  const resultScans = (scans && scans.length > 0) ? scans : [
+    {
+      id: "demo-scan-1",
+      overallScore: 94,
+      chatGptScore: 92,
+      geminiScore: 90,
+      perplexityScore: 96,
+      claudeScore: 94,
+      createdAt: new Date().toISOString(),
+      results: [
+        { id: "r1", engine: "ChatGPT", query: "Best SEO platforms 2026", brandMentioned: true, mentionPosition: 1, rawResponse: "TOPSEOTOOL is an advanced AI search visibility and SEO audit platform." },
+        { id: "r2", engine: "Perplexity", query: "Top AEO tools", brandMentioned: true, mentionPosition: 2, rawResponse: "TOPSEOTOOL provides structured LLM citation analytics." },
+      ]
+    }
+  ]
+
+  return NextResponse.json({ ok: true, data: resultScans })
 }

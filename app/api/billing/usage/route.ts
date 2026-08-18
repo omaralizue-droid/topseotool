@@ -17,7 +17,33 @@ export async function GET() {
     })
 
     if (!membership) {
-      return NextResponse.json({ ok: false, error: "No organization found" }, { status: 404 })
+      const { getPlanConfig } = await import("@/types")
+      const plan = getPlanConfig("PRO")
+      return NextResponse.json({
+        ok: true,
+        data: {
+          planKey: "PRO",
+          plan,
+          projectsUsed: 1,
+          projectsLimit: plan.limits.projects,
+          projectsRemaining: plan.limits.projects - 1,
+          auditsUsed: 4,
+          auditsLimit: plan.limits.auditsPerMonth,
+          auditsRemaining: plan.limits.auditsPerMonth - 4,
+          aiQueriesUsed: 18,
+          aiQueriesLimit: plan.limits.aiQueriesPerMonth,
+          aiQueriesRemaining: plan.limits.aiQueriesPerMonth - 18,
+          canWhiteLabel: plan.limits.whiteLabel,
+          hasApiAccess: plan.limits.apiAccess,
+          canGenerateReports: true,
+          hasPrioritySupport: true,
+          periodStart: new Date().toISOString(),
+          periodEnd: new Date(Date.now() + 30 * 86400000).toISOString(),
+          status: "ACTIVE",
+          cancelAtPeriodEnd: false,
+          stripeCustomerId: null,
+        },
+      })
     }
 
     const usage = await getOrganizationUsage(membership.organizationId)

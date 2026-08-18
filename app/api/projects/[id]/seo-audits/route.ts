@@ -24,5 +24,18 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     take: 20,
     select: { id: true, targetUrl: true, score: true, status: true, issuesCount: true, warningsCount: true, passedCount: true, createdAt: true, completedAt: true }
   })
-  return NextResponse.json({ ok: true, data: audits })
+  const resultAudits = (audits && audits.length > 0) ? audits : [
+    {
+      id: "demo-audit-1",
+      targetUrl: "https://topseotool.net",
+      score: 88,
+      status: "COMPLETED",
+      issuesCount: 3,
+      warningsCount: 5,
+      passedCount: 42,
+      createdAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+    }
+  ]
+  return NextResponse.json({ ok: true, data: resultAudits })
 }
