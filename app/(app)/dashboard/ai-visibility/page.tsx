@@ -69,10 +69,10 @@ export default async function DashboardAIVisibilityPage() {
   const visibilityScore = latestScan?.overallScore ?? 92
 
   // Gather all prompt results from scans
-  const allResults = primaryProject.aiVisibilityScans.flatMap((s) => s.results)
+  const allResults = primaryProject.aiVisibilityScans.flatMap((s: any) => s.results ?? [])
   const totalResults = allResults.length || 1
 
-  const mentionsCount = allResults.filter((r) => r.brandMentioned).length
+  const mentionsCount = allResults.filter((r: any) => r.brandMentioned).length
   const mentionRate = Math.round((mentionsCount / totalResults) * 100) || 85
 
   const citationsCount = primaryProject.aiCitations.length
@@ -81,7 +81,7 @@ export default async function DashboardAIVisibilityPage() {
   const competitorShare = primaryProject.competitors.length > 0 ? 45 : 30
 
   // Identify Lost Opportunities (queries where brand was not mentioned but response was generated)
-  const lostOpportunities = allResults.filter((r) => !r.brandMentioned)
+  const lostOpportunities = allResults.filter((r: any) => !r.brandMentioned)
 
   return (
     <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -161,7 +161,7 @@ export default async function DashboardAIVisibilityPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {lostOpportunities.slice(0, 4).map((opp) => (
+                {lostOpportunities.slice(0, 4).map((opp: any) => (
                   <div key={opp.id} className="p-3 rounded-lg border border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/10 space-y-1">
                     <div className="flex items-center justify-between text-xs">
                       <Badge variant="outline" className="text-[10px] uppercase font-mono">{opp.engine}</Badge>
@@ -195,7 +195,7 @@ export default async function DashboardAIVisibilityPage() {
               />
             ) : (
               <div className="space-y-3">
-                {allResults.slice(0, 4).map((res) => (
+                {allResults.slice(0, 4).map((res: any) => (
                   <div key={res.id} className="p-3 rounded-lg border border-border bg-card/60 space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
                       <Badge variant="outline" className="text-[10px] font-mono">{res.engine}</Badge>

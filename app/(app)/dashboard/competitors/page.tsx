@@ -78,7 +78,7 @@ export default async function DashboardCompetitorsPage() {
     isUserBrand: true,
   }
 
-  const competitorRows = primaryProject.competitors.map((c) => ({
+  const competitorRows = (primaryProject.competitors ?? []).map((c: any) => ({
     id: c.id,
     name: c.name ?? c.domain,
     domain: c.domain,
@@ -89,13 +89,13 @@ export default async function DashboardCompetitorsPage() {
     recommendationRate: 30,
     sentiment: "NEUTRAL",
     contentCoverage: 60,
-    addedDate: c.createdAt,
+    addedDate: c.createdAt ?? new Date(),
     isUserBrand: false,
   }))
 
   const allRows = [userRow, ...competitorRows]
 
-  const chartData = allRows.map((r) => ({
+  const chartData = allRows.map((r: any) => ({
     name: r.name,
     score: r.aiVisibility,
     isUser: r.isUserBrand,

@@ -73,9 +73,9 @@ const nextAuthInstance = NextAuth({
 
 export const { handlers, signIn, signOut } = nextAuthInstance;
 
-export const auth = async (...args: Parameters<typeof nextAuthInstance.auth>) => {
+export const auth = async (...args: any[]): Promise<any> => {
   if (BYPASS_AUTH) {
     return MOCK_SESSION as any;
   }
-  return nextAuthInstance.auth(...args);
+  return (nextAuthInstance.auth as any)(...args);
 };

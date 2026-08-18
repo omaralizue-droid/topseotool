@@ -115,21 +115,21 @@ export default async function DashboardPage() {
   }
 
   const allProjectsList = projects.length > 0 ? projects : [primaryProject]
-  const formattedProjects = allProjectsList.map((p) => ({
+  const formattedProjects = allProjectsList.map((p: any) => ({
     id: p.id,
     name: p.name,
     domain: p.websites?.[0]?.domain ?? "topseotool.net",
     color: p.color ?? "#6366f1",
   }))
 
-  const formattedCompetitors = primaryProject.competitors.map((c) => ({
+  const formattedCompetitors = (primaryProject.competitors ?? []).map((c: any) => ({
     name: c.name ?? c.domain,
     domain: c.domain,
     seoScore: c.seoScore ?? 72,
     aiVisibility: c.aiVisibility ?? 45,
   }))
 
-  const formattedMentions = primaryProject.brandMentions.map((m) => ({
+  const formattedMentions = (primaryProject.brandMentions ?? []).map((m: any) => ({
     id: m.id,
     source: m.engine,
     query: m.query,
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
     sentiment: m.sentiment,
   }))
 
-  const formattedCitations = primaryProject.aiCitations.map((c) => ({
+  const formattedCitations = (primaryProject.aiCitations ?? []).map((c: any) => ({
     id: c.id,
     sourceUrl: c.sourceUrl,
     sourceTitle: c.sourceTitle,
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
     citationStrength: c.citationStrength,
   }))
 
-  const formattedRecs = primaryProject.recommendations.map((r) => ({
+  const formattedRecs = (primaryProject.recommendations ?? []).map((r: any) => ({
     id: r.id,
     type: r.type,
     priority: r.priority,
