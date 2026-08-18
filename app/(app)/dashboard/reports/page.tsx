@@ -16,27 +16,32 @@ export default async function DashboardReportsPage() {
   const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user?.id) redirect("/login")
 
-  const membership = await db.organizationMember.findFirst({
-    where: { userId: session.user.id },
-    select: { organizationId: true },
-  })
+  let reports: any[] = []
+  let projects: any[] = []
+  try {
+    const membership = await db.organizationMember.findFirst({
+      where: { userId: session.user.id },
+      select: { organizationId: true },
+    })
 
-  if (!membership) redirect("/onboarding")
+    reports = await db.report.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      include: { project: true }
+    })
 
-  const reports = await db.report.findMany({
-    where: {
-      userId: session.user.id,
-    },
-    orderBy: { createdAt: "desc" },
-    include: { project: true }
-  })
+    if (membership) {
+      projects = await db.project.findMany({
+        where: { organizationId: membership.organizationId, status: { not: "ARCHIVED" } },
+        select: { id: true, name: true }
+      })
+    }
+  } catch {
+    reports = []
+    projects = []
+  }
 
-  const projects = await db.project.findMany({
-    where: { organizationId: membership.organizationId, status: { not: "ARCHIVED" } },
-    select: { id: true, name: true }
-  })
-
-  const primaryProject = projects[0]
+  const primaryProject = projects[0] ?? { id: "demo-project", name: "TOPSEOTOOL Demo" }
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">

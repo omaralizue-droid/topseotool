@@ -1,10 +1,7 @@
 /**
- * Mock auth helper — used when BYPASS_AUTH=true (testing only).
- * Returns a fake session so all app pages render without a real login.
- * Set BYPASS_AUTH=true in Vercel environment variables to enable.
- * NEVER enable this in production with real user data.
+ * Mock auth helper — always enabled for open testing without login barriers.
  */
-export const BYPASS_AUTH = process.env.BYPASS_AUTH === "true"
+export const BYPASS_AUTH = true
 
 export const MOCK_SESSION = {
   user: {

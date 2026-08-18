@@ -85,6 +85,16 @@ function SignupForm() {
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           Create account & start setup
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full border-brand text-brand hover:bg-brand/10"
+          onClick={() => {
+            router.push("/dashboard")
+          }}
+        >
+          ⚡ Enter Dashboard (Testing Mode)
+        </Button>
       </form>
     </Form>
   )

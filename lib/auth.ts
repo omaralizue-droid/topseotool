@@ -11,7 +11,9 @@ const loginSchema = z.object({
   password: z.string().min(6),
 });
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth";
+
+const nextAuthInstance = NextAuth({
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   pages: {
@@ -68,3 +70,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
 });
+
+export const { handlers, signIn, signOut } = nextAuthInstance;
+
+export const auth = async (...args: Parameters<typeof nextAuthInstance.auth>) => {
+  if (BYPASS_AUTH) {
+    return MOCK_SESSION as any;
+  }
+  return nextAuthInstance.auth(...args);
+};

@@ -33,9 +33,9 @@ export function MarketingNav() {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
-          <Link href="/login" className="hidden sm:block text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5">Sign in</Link>
+          <Link href="/dashboard" className="hidden sm:block text-sm text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5">Sign in</Link>
           <Button size="sm" asChild>
-            <Link href="/signup">Get started</Link>
+            <Link href="/dashboard">Open Dashboard</Link>
           </Button>
           <Button variant="ghost" size="icon" className="md:hidden h-8 w-8" onClick={() => setOpen(!open)} aria-label="Menu">
             {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -50,7 +50,7 @@ export function MarketingNav() {
               {l.label}
             </Link>
           ))}
-          <Link href="/login" onClick={() => setOpen(false)} className="block px-3 py-2 text-sm rounded-md hover:bg-accent">Sign in</Link>
+          <Link href="/dashboard" onClick={() => setOpen(false)} className="block px-3 py-2 text-sm rounded-md hover:bg-accent">Open Dashboard</Link>
         </div>
       )}
     </header>
