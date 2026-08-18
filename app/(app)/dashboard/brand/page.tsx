@@ -3,6 +3,7 @@ import Link from "next/link"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
 import { Zap, Play, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +17,7 @@ import { EmptyState } from "@/components/ui/empty-state"
 export const metadata: Metadata = { title: "AI Brand Perception | TOPSEOTOOL" }
 
 export default async function DashboardBrandPage() {
-  const session = await auth()
+  const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user?.id) redirect("/login")
 
   const membership = await db.organizationMember.findFirst({

@@ -3,6 +3,7 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
 import { ArrowLeft, Users2, Globe, Clock, ShieldCheck, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -15,7 +16,7 @@ interface Props { params: Promise<{ projectId: string; competitorId: string }> }
 
 export default async function CompetitorDetailPage({ params }: Props) {
   const { projectId, competitorId } = await params
-  const session = await auth()
+  const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user?.id) redirect("/login")
 
   const competitor = await db.competitor.findFirst({

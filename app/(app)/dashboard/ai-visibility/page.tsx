@@ -3,6 +3,7 @@ import Link from "next/link"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
 import { Brain, TrendingUp, Link2, Users2, AlertTriangle, ArrowRight, Play, CheckCircle2, XCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -15,7 +16,7 @@ import { formatRelativeTime } from "@/lib/utils"
 export const metadata: Metadata = { title: "AI Search Visibility | TOPSEOTOOL" }
 
 export default async function DashboardAIVisibilityPage() {
-  const session = await auth()
+  const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user?.id) redirect("/login")
 
   const membership = await db.organizationMember.findFirst({

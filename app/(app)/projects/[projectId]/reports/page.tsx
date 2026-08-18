@@ -3,6 +3,7 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
 import { ArrowLeft, FileText, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -15,7 +16,7 @@ interface Props { params: Promise<{ projectId: string }> }
 
 export default async function ProjectReportsPage({ params }: Props) {
   const { projectId } = await params
-  const session = await auth()
+  const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user?.id) redirect("/login")
 
   const project = await db.project.findFirst({

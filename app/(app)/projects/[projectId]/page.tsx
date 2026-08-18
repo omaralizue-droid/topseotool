@@ -3,6 +3,7 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
 import {
   Globe, Brain, MessageSquare, Link2, Users2, Zap,
   Lightbulb, History, FileText, ArrowRight, Clock, Layers
@@ -29,7 +30,7 @@ interface Props { params: Promise<{ projectId: string }> }
 
 export default async function ProjectOverviewPage({ params }: Props) {
   const { projectId } = await params
-  const session = await auth()
+  const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user?.id) redirect("/login")
 
   const project = await db.project.findFirst({

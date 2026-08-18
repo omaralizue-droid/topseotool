@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { AppShell } from "@/components/layout/app-shell"
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
 
 export const metadata: Metadata = {
   robots: {
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
+  const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user) redirect("/login")
 
   return (

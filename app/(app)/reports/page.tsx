@@ -1,13 +1,14 @@
 import type { Metadata } from "next"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
 import { FileText, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = { title: "Reports | TOPSEOTOOL" }
 
 export default async function GlobalReportsPage() {
-  const session = await auth()
+  const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user?.id) redirect("/login")
 
   return (

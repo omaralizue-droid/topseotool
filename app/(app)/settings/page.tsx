@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
 import { Settings, User, Key, Bell, Shield } from "lucide-react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button"
 export const metadata: Metadata = { title: "Account Settings | TOPSEOTOOL" }
 
 export default async function SettingsPage() {
-  const session = await auth()
+  const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
   if (!session?.user) redirect("/login")
 
   return (
