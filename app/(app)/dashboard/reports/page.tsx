@@ -24,17 +24,17 @@ export default async function DashboardReportsPage() {
       select: { organizationId: true },
     })
 
-    reports = await db.report.findMany({
+    reports = (await db.report.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
       include: { project: true }
-    })
+    })) ?? []
 
     if (membership) {
-      projects = await db.project.findMany({
+      projects = (await db.project.findMany({
         where: { organizationId: membership.organizationId, status: { not: "ARCHIVED" } },
         select: { id: true, name: true }
-      })
+      })) ?? []
     }
   } catch {
     reports = []
