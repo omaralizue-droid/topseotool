@@ -3,9 +3,19 @@ import { useState, useEffect, useRef, useCallback } from "react"
 
 export type ScanStatus = "idle" | "running" | "completed" | "failed"
 
+export interface AEOPresetRecommendation {
+  priority: "CRITICAL" | "HIGH" | "MEDIUM"
+  title: string
+  engineTarget: string
+  impact: string
+  action: string
+}
+
 export interface PublicScanResult {
   websiteUrl: string
   brandName: string
+  competitorUrl?: string
+  competitorBrand?: string
   pageContext?: { title?: string; description?: string; keywords?: string }
   metrics: {
     totalQueries: number
@@ -23,6 +33,36 @@ export interface PublicScanResult {
       total: number
       sentiment: string
     }>
+  }
+  competitorMetrics?: {
+    totalQueries: number
+    mentionsCount: number
+    mentionRate: number
+    recommendationRate: number
+    citationRate: number
+    competitorRate: number
+    sentimentScore: number
+    overallVisibilityScore: number
+    perEngineStats: Array<{
+      engine: string
+      mentionRate: number
+      mentions: number
+      total: number
+      sentiment: string
+    }>
+  }
+  battleSummary?: {
+    winner: "PRIMARY" | "COMPETITOR" | "TIE"
+    primaryWinCount: number
+    competitorWinCount: number
+    tieCount: number
+    shareOfVoice: number
+    verdict: string
+  }
+  aeoPlaybook: {
+    llmsTxtContent: string
+    recommendations: AEOPresetRecommendation[]
+    schemaMarkupSnippet: string
   }
   results: Array<{
     query: string
@@ -48,7 +88,7 @@ interface UseScanPollingReturn {
   result: PublicScanResult | null
   error: string | null
   elapsedSeconds: number
-  startScan: (url: string) => Promise<void>
+  startScan: (url: string, competitorUrl?: string) => Promise<void>
   reset: () => void
 }
 
@@ -108,7 +148,6 @@ export function useScanPolling(): UseScanPollingReturn {
           // status === "running" → keep polling
         } catch (err) {
           console.error("Polling error:", err)
-          // Don't stop polling on transient errors
         }
       }, POLL_INTERVAL_MS)
     },
@@ -116,7 +155,7 @@ export function useScanPolling(): UseScanPollingReturn {
   )
 
   const startScan = useCallback(
-    async (url: string) => {
+    async (url: string, competitorUrl?: string) => {
       stopPolling()
       setStatus("running")
       setResult(null)
@@ -128,7 +167,7 @@ export function useScanPolling(): UseScanPollingReturn {
         const res = await fetch("/api/scan", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url }),
+          body: JSON.stringify({ url, competitorUrl }),
         })
         const data = await res.json()
 
@@ -159,7 +198,6 @@ export function useScanPolling(): UseScanPollingReturn {
     setElapsedSeconds(0)
   }, [stopPolling])
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => stopPolling()
   }, [stopPolling])

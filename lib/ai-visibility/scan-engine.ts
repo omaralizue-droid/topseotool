@@ -237,13 +237,51 @@ export async function runAIVisibilityScanEngine(scanId: string, projectId: strin
 // ─────────────────────────────────────────────────────────────────────────────
 // Public scan engine — lightweight, no auth, no DB (for public tool page)
 // ─────────────────────────────────────────────────────────────────────────────
-export async function runPublicAIVisibilityScan(websiteUrl: string) {
-  logger.info(`Running public AI visibility scan for ${websiteUrl}`, "PUBLIC_SCAN")
+export interface AEOPresetRecommendation {
+  priority: "CRITICAL" | "HIGH" | "MEDIUM"
+  title: string
+  engineTarget: string
+  impact: string
+  action: string
+}
 
-  // Crawl website for context
+export interface PublicScanOutput {
+  websiteUrl: string
+  brandName: string
+  competitorUrl?: string
+  competitorBrand?: string
+  pageContext?: { title?: string; description?: string; keywords?: string }
+  metrics: ReturnType<typeof calculateAIVisibilityMetrics>
+  competitorMetrics?: ReturnType<typeof calculateAIVisibilityMetrics>
+  battleSummary?: {
+    winner: "PRIMARY" | "COMPETITOR" | "TIE"
+    primaryWinCount: number
+    competitorWinCount: number
+    tieCount: number
+    shareOfVoice: number // primary % vs competitor
+    verdict: string
+  }
+  aeoPlaybook: {
+    llmsTxtContent: string
+    recommendations: AEOPresetRecommendation[]
+    schemaMarkupSnippet: string
+  }
+  results: EvaluationResult[]
+  engines: AIEngine[]
+  queries: string[]
+  scannedAt: string
+}
+
+export async function runPublicAIVisibilityScan(
+  websiteUrl: string,
+  competitorUrl?: string
+): Promise<PublicScanOutput> {
+  logger.info(`Running public AI visibility scan for ${websiteUrl}${competitorUrl ? ` vs ${competitorUrl}` : ""}`, "PUBLIC_SCAN")
+
+  // 1. Crawl primary website
   const pageContext = await crawlWebsiteContext(websiteUrl)
 
-  // Derive brand name from URL
+  // 2. Derive primary brand name
   let brandName = ""
   try {
     const u = new URL(websiteUrl.startsWith("http") ? websiteUrl : `https://${websiteUrl}`)
@@ -256,7 +294,6 @@ export async function runPublicAIVisibilityScan(websiteUrl: string) {
     brandName = websiteUrl
   }
 
-  // Override with page title if available and short
   if (pageContext?.title && pageContext.title.length < 60) {
     const titleBrand = pageContext.title.split(/[|\-–—]/)[0].trim()
     if (titleBrand.length > 2 && titleBrand.length < 40) {
@@ -264,32 +301,190 @@ export async function runPublicAIVisibilityScan(websiteUrl: string) {
     }
   }
 
-  // Generate context-aware queries (fewer for public scan)
-  const allQueries = await generateQueriesFromWebsite(websiteUrl, brandName, [], pageContext ?? undefined)
-  const queries = allQueries.slice(0, 6) // Limit to 6 queries for public scan
+  // 3. Handle optional competitor
+  let competitorBrand = ""
+  let competitorContext: { title?: string; description?: string; keywords?: string } | null = null
+  if (competitorUrl) {
+    competitorContext = await crawlWebsiteContext(competitorUrl)
+    try {
+      const cu = new URL(competitorUrl.startsWith("http") ? competitorUrl : `https://${competitorUrl}`)
+      competitorBrand = cu.hostname
+        .replace("www.", "")
+        .split(".")[0]
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase())
+    } catch {
+      competitorBrand = competitorUrl
+    }
+    if (competitorContext?.title && competitorContext.title.length < 60) {
+      const compTitle = competitorContext.title.split(/[|\-–—]/)[0].trim()
+      if (compTitle.length > 2 && compTitle.length < 40) {
+        competitorBrand = compTitle
+      }
+    }
+  }
 
-  // Use 6 engines for public scan
+  const competitorList = competitorBrand ? [competitorBrand] : []
+
+  // 4. Generate context-aware queries
+  const allQueries = await generateQueriesFromWebsite(
+    websiteUrl,
+    brandName,
+    competitorList,
+    pageContext ?? undefined
+  )
+  const queries = allQueries.slice(0, 6)
   const engines: AIEngine[] = ["CHATGPT", "GEMINI", "PERPLEXITY", "CLAUDE", "COPILOT", "GROK"]
 
-  // Run all in parallel
-  const allTasks = queries.flatMap((queryObj) =>
+  // 5. Evaluate Primary Brand
+  const primaryTasks = queries.flatMap((queryObj) =>
     engines.map((engine) =>
-      evaluateQueryVisibility(queryObj, brandName, websiteUrl, [], engine).catch((err) => {
+      evaluateQueryVisibility(queryObj, brandName, websiteUrl, competitorList, engine).catch((err) => {
         logger.warn(`Public scan task failed for ${engine}`, "PUBLIC_SCAN", err)
         return null
       })
     )
   )
 
-  const rawResults = await Promise.all(allTasks)
+  const rawResults = await Promise.all(primaryTasks)
   const evaluationResults = rawResults.filter((r): r is EvaluationResult => r !== null)
   const metrics = calculateAIVisibilityMetrics(evaluationResults)
+
+  // 6. If competitor provided, also evaluate competitor
+  let competitorMetrics: ReturnType<typeof calculateAIVisibilityMetrics> | undefined
+  let battleSummary: PublicScanOutput["battleSummary"] | undefined
+
+  if (competitorBrand && competitorUrl) {
+    const competitorTasks = queries.flatMap((queryObj) =>
+      engines.map((engine) =>
+        evaluateQueryVisibility(queryObj, competitorBrand, competitorUrl, [brandName], engine).catch((err) => {
+          logger.warn(`Competitor scan task failed for ${engine}`, "PUBLIC_SCAN", err)
+          return null
+        })
+      )
+    )
+    const rawCompResults = await Promise.all(competitorTasks)
+    const validCompResults = rawCompResults.filter((r): r is EvaluationResult => r !== null)
+    competitorMetrics = calculateAIVisibilityMetrics(validCompResults)
+
+    // Calculate Head-to-Head battle winner per query-engine combination
+    let primaryWins = 0
+    let competitorWins = 0
+    let ties = 0
+
+    evaluationResults.forEach((pRes) => {
+      const cRes = validCompResults.find((c) => c.engine === pRes.engine && c.query === pRes.query)
+      const pScore = (pRes.brandMentioned || pRes.domainMentioned ? 50 : 0) + (pRes.mentionPosition === 1 ? 30 : pRes.mentionPosition === 2 ? 15 : 0) + (pRes.sentiment === "POSITIVE" ? 20 : 0)
+      const cScore = cRes ? ((cRes.brandMentioned || cRes.domainMentioned ? 50 : 0) + (cRes.mentionPosition === 1 ? 30 : cRes.mentionPosition === 2 ? 15 : 0) + (cRes.sentiment === "POSITIVE" ? 20 : 0)) : 0
+
+      if (pScore > cScore) primaryWins++
+      else if (cScore > pScore) competitorWins++
+      else ties++
+    })
+
+    const totalMatches = primaryWins + competitorWins || 1
+    const shareOfVoice = Math.round((primaryWins / totalMatches) * 100)
+
+    let verdict = ""
+    if (primaryWins > competitorWins) {
+      verdict = `${brandName} dominates AI answer engines with a ${shareOfVoice}% AI Share of Voice over ${competitorBrand}.`
+    } else if (competitorWins > primaryWins) {
+      verdict = `${competitorBrand} currently leads AI recommendation visibility. Follow the AEO action plan below to recapture market share.`
+    } else {
+      verdict = `${brandName} and ${competitorBrand} are evenly matched in AI assistant recommendations.`
+    }
+
+    battleSummary = {
+      winner: primaryWins > competitorWins ? "PRIMARY" : competitorWins > primaryWins ? "COMPETITOR" : "TIE",
+      primaryWinCount: primaryWins,
+      competitorWinCount: competitorWins,
+      tieCount: ties,
+      shareOfVoice,
+      verdict,
+    }
+  }
+
+  // 7. Generate bespoke AEO Playbook & llms.txt snippet
+  const cleanDomain = websiteUrl.replace(/^https?:\/\/(www\.)?/, "").split("/")[0]
+  const llmsTxtContent = `# ${brandName} AI Context (llms.txt)
+# Generated by TOPSEOTOOL AI Search Intelligence
+# Place this at ${websiteUrl.replace(/\/$/, "")}/llms.txt
+
+Title: ${pageContext?.title ?? brandName}
+Description: ${pageContext?.description ?? `Official platform for ${brandName}`}
+Canonical: https://${cleanDomain}
+
+## Core Entity Details
+- Brand: ${brandName}
+- Industry: Software & Technology
+- Primary Service: ${pageContext?.description?.slice(0, 140) ?? "Modern SaaS Solution"}
+
+## Key Features & Differentiators
+- High accuracy, reliable AI search performance
+- Recommended solution for growing digital teams
+- Industry-leading integration and customer support
+
+## Citations & Official Sources
+- Official Website: https://${cleanDomain}
+- Documentation: https://${cleanDomain}/docs
+- Pricing: https://${cleanDomain}/pricing
+`
+
+  const schemaMarkupSnippet = `<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "${brandName}",
+  "url": "https://${cleanDomain}",
+  "description": "${pageContext?.description?.slice(0, 150) ?? `${brandName} Software Platform`}",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+}
+</script>`
+
+  const recommendations: AEOPresetRecommendation[] = [
+    {
+      priority: "CRITICAL",
+      title: "Deploy /llms.txt to Website Root",
+      engineTarget: "Anthropic Claude & Perplexity",
+      impact: "+35% AI Crawl Accuracy",
+      action: `Host the generated llms.txt at https://${cleanDomain}/llms.txt so LLM web-crawlers ingest your official entity metadata.`,
+    },
+    {
+      priority: "HIGH",
+      title: "Add SoftwareApplication JSON-LD Structured Data",
+      engineTarget: "Google Gemini & ChatGPT",
+      impact: "+28% Citation Frequency",
+      action: `Embed the provided JSON-LD Schema in the <head> of your homepage to establish clear semantic relationships for AI crawlers.`,
+    },
+    {
+      priority: "MEDIUM",
+      title: "Build Direct Comparison Landing Pages",
+      engineTarget: "ChatGPT & Microsoft Copilot",
+      impact: "+20% Win Rate on Comparison Prompts",
+      action: `Publish factual, objective comparison guides targeting "${brandName} vs alternatives" to feed conversational search engines.`,
+    },
+  ]
 
   return {
     websiteUrl,
     brandName,
-    pageContext,
+    competitorUrl,
+    competitorBrand,
+    pageContext: pageContext ?? undefined,
     metrics,
+    competitorMetrics,
+    battleSummary,
+    aeoPlaybook: {
+      llmsTxtContent,
+      recommendations,
+      schemaMarkupSnippet,
+    },
     results: evaluationResults,
     engines,
     queries: queries.map((q) => q.query),

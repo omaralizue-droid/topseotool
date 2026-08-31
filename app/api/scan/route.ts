@@ -36,13 +36,13 @@ export async function POST(req: NextRequest) {
     if (!rl.allowed) return rateLimitResponse(rl.resetMs)
 
     const body = await req.json()
-    const { url } = body
+    const { url, competitorUrl } = body
 
     if (!url || typeof url !== "string") {
       return NextResponse.json({ error: "URL is required" }, { status: 400 })
     }
 
-    // Validate URL format
+    // Validate Primary URL format
     let parsedUrl: URL
     try {
       parsedUrl = new URL(url.startsWith("http") ? url : `https://${url}`)
@@ -62,6 +62,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Private URLs are not allowed" }, { status: 400 })
     }
 
+    // Validate Competitor URL if provided
+    let parsedCompUrl: URL | undefined
+    if (competitorUrl && typeof competitorUrl === "string" && competitorUrl.trim()) {
+      try {
+        parsedCompUrl = new URL(competitorUrl.startsWith("http") ? competitorUrl : `https://${competitorUrl}`)
+        const compHostname = parsedCompUrl.hostname
+        if (
+          compHostname === "localhost" ||
+          compHostname === "127.0.0.1" ||
+          compHostname.startsWith("192.168.") ||
+          compHostname.startsWith("10.") ||
+          compHostname.endsWith(".local")
+        ) {
+          return NextResponse.json({ error: "Private competitor URLs are not allowed" }, { status: 400 })
+        }
+      } catch {
+        return NextResponse.json({ error: "Invalid Competitor URL format" }, { status: 400 })
+      }
+    }
+
     // Generate a scan ID
     const scanId = `pub_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 
@@ -69,7 +89,7 @@ export async function POST(req: NextRequest) {
     publicScanStore.set(scanId, { status: "running", startedAt: Date.now() })
 
     // Run scan in background (non-blocking)
-    runPublicAIVisibilityScan(parsedUrl.href)
+    runPublicAIVisibilityScan(parsedUrl.href, parsedCompUrl?.href)
       .then((result) => {
         publicScanStore.set(scanId, { status: "completed", result, startedAt: Date.now() })
         logger.info(`Public scan ${scanId} completed for ${url}`, "PUBLIC_SCAN_API")
