@@ -44,14 +44,14 @@ export default function NewProjectPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-xl mx-auto animate-fade-in">
-      <Button variant="ghost" size="sm" asChild className="mb-6 -ml-2 text-muted-foreground">
-        <Link href="/projects"><ArrowLeft className="h-4 w-4" />Back to projects</Link>
+    <div className="p-4 sm:p-6 md:p-8 max-w-xl mx-auto animate-fade-in">
+      <Button variant="ghost" size="sm" asChild className="mb-4 sm:mb-6 -ml-2 text-muted-foreground">
+        <Link href="/projects"><ArrowLeft className="h-4 w-4 mr-1" />Back to projects</Link>
       </Button>
 
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight mb-1">New project</h1>
-        <p className="text-sm text-muted-foreground">Add a website to start tracking its SEO and AI visibility.</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1">New project</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">Add a website to start tracking its SEO and AI visibility.</p>
       </div>
 
       <Form {...form}>

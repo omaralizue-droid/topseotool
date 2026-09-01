@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function ResourcesIndexPage() {
   return (
-    <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 space-y-12 animate-fade-in">
+    <div className="py-12 sm:py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 animate-fade-in">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", item: "/" },
@@ -29,15 +29,15 @@ export default function ResourcesIndexPage() {
       <div className="text-center space-y-3 max-w-2xl mx-auto">
         <Badge variant="brand" className="mb-1">Knowledge Hub</Badge>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-          Resource Center & Research
+          Resource Center &amp; Research
         </h1>
-        <p className="text-muted-foreground text-base">
+        <p className="text-muted-foreground text-sm sm:text-base">
           In-depth technical guides, empirical AI ranking factor studies, and actionable optimization playbooks.
         </p>
       </div>
 
       {/* Resources Grid */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {RESOURCES.map((res) => (
           <Card key={res.slug} className="flex flex-col justify-between hover:border-brand/40 transition-all hover:shadow-md bg-card">
             <CardHeader className="p-6">

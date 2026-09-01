@@ -78,27 +78,27 @@ export default function SEOAuditPage() {
     : { label: "Pending", color: "text-muted-foreground" }
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
+    <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <Button variant="ghost" size="icon" asChild className="h-8 w-8 shrink-0">
             <Link href={`/projects/${projectId}`}><ArrowLeft className="h-4 w-4" /></Link>
           </Button>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight">SEO Website Audit Engine</h1>
-              <Badge variant="brand">Technical & On-Page</Badge>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight">SEO Website Audit Engine</h1>
+              <Badge variant="brand" className="text-[10px]">Technical &amp; On-Page</Badge>
             </div>
-            <p className="text-sm text-muted-foreground">Comprehensive technical crawl, meta tags, and structured data analysis</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Comprehensive technical crawl, meta tags, and structured data analysis</p>
           </div>
         </div>
       </div>
 
       {/* Crawl form */}
       <Card>
-        <CardContent className="p-5">
+        <CardContent className="p-4 sm:p-5">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit((v) => triggerAudit.mutate(v))} className="flex gap-3">
+            <form onSubmit={form.handleSubmit((v) => triggerAudit.mutate(v))} className="flex flex-col sm:flex-row gap-3">
               <FormField
                 control={form.control}
                 name="url"
@@ -114,7 +114,7 @@ export default function SEOAuditPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={triggerAudit.isPending}>
+              <Button type="submit" disabled={triggerAudit.isPending} className="w-full sm:w-auto shrink-0">
                 {triggerAudit.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Play className="h-4 w-4 mr-2" />}
                 Run Full Audit
               </Button>
@@ -125,12 +125,12 @@ export default function SEOAuditPage() {
 
       {/* Audit Overview Header */}
       {activeAudit && (
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Main Score Card */}
-          <Card className="md:col-span-1 flex flex-col justify-center items-center p-6 text-center">
+          <Card className="md:col-span-1 flex flex-col justify-center items-center p-5 sm:p-6 text-center">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Overall SEO Score</span>
             <div className="relative flex items-center justify-center my-2">
-              <span className={`text-5xl font-extrabold font-mono-nums ${scoreColor}`}>
+              <span className={`text-4xl sm:text-5xl font-extrabold font-mono-nums ${scoreColor}`}>
                 {activeAudit.score ?? "—"}
               </span>
             </div>
@@ -142,25 +142,25 @@ export default function SEOAuditPage() {
           </Card>
 
           {/* Checks Summary Card */}
-          <Card className="md:col-span-2 p-6 flex flex-col justify-between">
+          <Card className="md:col-span-2 p-5 sm:p-6 flex flex-col justify-between">
             <h3 className="font-semibold text-sm mb-4">Signal Checks Summary</h3>
-            <div className="grid grid-cols-3 gap-4 text-center mb-4">
-              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30">
-                <p className="text-2xl font-bold font-mono-nums text-red-600 dark:text-red-400">{activeAudit.issuesCount}</p>
-                <p className="text-xs text-muted-foreground font-medium mt-0.5">Critical</p>
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-4 text-center mb-4">
+              <div className="p-2.5 sm:p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30">
+                <p className="text-xl sm:text-2xl font-bold font-mono-nums text-red-600 dark:text-red-400">{activeAudit.issuesCount}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground font-medium mt-0.5">Critical</p>
               </div>
-              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30">
-                <p className="text-2xl font-bold font-mono-nums text-amber-600 dark:text-amber-400">{activeAudit.warningsCount}</p>
-                <p className="text-xs text-muted-foreground font-medium mt-0.5">Warnings</p>
+              <div className="p-2.5 sm:p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30">
+                <p className="text-xl sm:text-2xl font-bold font-mono-nums text-amber-600 dark:text-amber-400">{activeAudit.warningsCount}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground font-medium mt-0.5">Warnings</p>
               </div>
-              <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30">
-                <p className="text-2xl font-bold font-mono-nums text-emerald-600 dark:text-emerald-400">{activeAudit.passedCount}</p>
-                <p className="text-xs text-muted-foreground font-medium mt-0.5">Passed</p>
+              <div className="p-2.5 sm:p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30">
+                <p className="text-xl sm:text-2xl font-bold font-mono-nums text-emerald-600 dark:text-emerald-400">{activeAudit.passedCount}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground font-medium mt-0.5">Passed</p>
               </div>
             </div>
-            <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t border-border">
-              <span>Target: <strong className="text-foreground font-mono">{activeAudit.targetUrl}</strong></span>
-              <Badge variant="outline">{activeAudit.status}</Badge>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-muted-foreground pt-2 border-t border-border">
+              <span className="truncate">Target: <strong className="text-foreground font-mono truncate">{activeAudit.targetUrl}</strong></span>
+              <Badge variant="outline" className="w-fit">{activeAudit.status}</Badge>
             </div>
           </Card>
         </div>
@@ -174,7 +174,7 @@ export default function SEOAuditPage() {
             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-14 w-full" />)}
           </div>
         ) : !audits?.length ? (
-          <Card className="p-8 text-center border-dashed">
+          <Card className="p-6 sm:p-8 text-center border-dashed">
             <Globe className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
             <p className="font-medium text-sm mb-1">No audits recorded yet</p>
             <p className="text-xs text-muted-foreground">Enter a website URL above to initiate your first automated crawl.</p>
@@ -185,21 +185,23 @@ export default function SEOAuditPage() {
               <div
                 key={audit.id}
                 onClick={() => setActiveAuditId(audit.id)}
-                className={`flex items-center justify-between p-4 bg-card border rounded-lg transition-all cursor-pointer ${
+                className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 sm:p-4 bg-card border rounded-xl transition-all cursor-pointer ${
                   activeAuditId === audit.id ? "border-brand shadow-sm" : "border-border hover:border-brand/30"
                 }`}
               >
-                <div className="min-w-0 flex-1 pr-4">
+                <div className="min-w-0 flex-1 sm:pr-4">
                   <p className="text-sm font-medium truncate">{audit.targetUrl}</p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                    <Clock className="h-3 w-3" /> {formatRelativeTime(audit.createdAt)}
+                    <Clock className="h-3 w-3 shrink-0" /> {formatRelativeTime(audit.createdAt)}
                   </p>
                 </div>
-                <div className="flex items-center gap-4 text-xs font-mono-nums">
-                  <span className="text-red-500 font-bold">{audit.issuesCount} critical</span>
-                  <span className="text-amber-500 font-bold">{audit.warningsCount} warnings</span>
-                  <span className="text-emerald-500 font-bold">{audit.passedCount} passed</span>
-                  <span className="text-xl font-bold font-mono text-brand ml-2">{audit.score ?? "—"}</span>
+                <div className="flex items-center justify-between sm:justify-end gap-3 text-xs font-mono-nums border-t sm:border-0 border-border/40 pt-2 sm:pt-0">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-red-500 font-bold">{audit.issuesCount} crit</span>
+                    <span className="text-amber-500 font-bold">{audit.warningsCount} warn</span>
+                    <span className="text-emerald-500 font-bold">{audit.passedCount} pass</span>
+                  </div>
+                  <span className="text-lg sm:text-xl font-bold font-mono text-brand ml-1">{audit.score ?? "—"}</span>
                 </div>
               </div>
             ))}

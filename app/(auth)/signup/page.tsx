@@ -102,10 +102,10 @@ function SignupForm() {
 
 export default function SignupPage() {
   return (
-    <div className="w-full max-w-sm">
-      <div className="mb-8 text-center">
+    <div className="w-full">
+      <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold tracking-tight mb-1">Get started free</h1>
-        <p className="text-sm text-muted-foreground">Create your TOPSEOTOOL account</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">Create your TOPSEOTOOL account</p>
       </div>
 
       <Suspense fallback={<div className="text-center text-sm text-muted-foreground">Loading form...</div>}>
@@ -118,9 +118,9 @@ export default function SignupPage() {
         <Link href="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
       </p>
       <div className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="text-brand hover:underline font-medium">Sign in</Link>
+          <Link href="/login" className="text-brand hover:underline font-semibold">Sign in</Link>
         </p>
       </div>
     </div>

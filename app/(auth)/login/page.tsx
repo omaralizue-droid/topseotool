@@ -94,10 +94,10 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="w-full max-w-sm">
-      <div className="mb-8 text-center">
+    <div className="w-full">
+      <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold tracking-tight mb-1">Welcome back</h1>
-        <p className="text-sm text-muted-foreground">Sign in to your TOPSEOTOOL account</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">Sign in to your TOPSEOTOOL account</p>
       </div>
 
       <Suspense fallback={<div className="text-center text-sm text-muted-foreground">Loading form...</div>}>
@@ -105,9 +105,9 @@ export default function LoginPage() {
       </Suspense>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-brand hover:underline font-medium">Sign up free</Link>
+          <Link href="/signup" className="text-brand hover:underline font-semibold">Sign up free</Link>
         </p>
       </div>
     </div>

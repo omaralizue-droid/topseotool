@@ -152,7 +152,7 @@ function SchemaGeneratorWidget() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {(["Organization", "FAQPage", "Product"] as const).map((t) => (
             <Button
               key={t}
@@ -223,12 +223,12 @@ function MetaTagAnalyzerWidget() {
   return (
     <Card className="border-border">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base">Meta Tag & Canonical Inspector</CardTitle>
+        <CardTitle className="text-base">Meta Tag &amp; Canonical Inspector</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input placeholder="https://example.com" value={targetUrl} onChange={(e) => setTargetUrl(e.target.value)} />
-          <Button onClick={handleAnalyze} disabled={analyzing} variant="brand">
+          <Button onClick={handleAnalyze} disabled={analyzing} variant="brand" className="w-full sm:w-auto shrink-0">
             {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Analyze URL"}
           </Button>
         </div>

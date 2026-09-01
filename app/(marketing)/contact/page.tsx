@@ -15,14 +15,14 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="py-20 md:py-28 max-w-xl mx-auto px-4 sm:px-6">
-      <div className="text-center mb-8">
+    <div className="py-12 sm:py-20 md:py-28 max-w-xl mx-auto px-4 sm:px-6">
+      <div className="text-center mb-6 sm:mb-8">
         <Badge variant="brand" className="mb-3">Get in touch</Badge>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Contact TOPSEOTOOL</h1>
-        <p className="text-sm text-muted-foreground">Have questions about our enterprise plans or AI search monitoring?</p>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Contact TOPSEOTOOL</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">Have questions about our enterprise plans or AI search monitoring?</p>
       </div>
 
-      <form className="space-y-4 bg-card border border-border p-6 rounded-xl shadow-sm">
+      <form className="space-y-4 bg-card border border-border p-5 sm:p-6 rounded-xl shadow-sm">
         <div className="space-y-1.5">
           <Label>Your Name</Label>
           <Input placeholder="John Doe" />

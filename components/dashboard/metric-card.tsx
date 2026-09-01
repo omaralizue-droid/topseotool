@@ -31,24 +31,24 @@ export function MetricCard({
 
   return (
     <Card className="relative overflow-hidden hover:border-brand/40 transition-all duration-200">
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{title}</span>
-          <div className={cn("p-2 rounded-lg bg-muted/60", color)}>
-            <Icon className="h-4 w-4" />
+      <CardContent className="p-3.5 sm:p-5">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
+          <span className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider truncate mr-1">{title}</span>
+          <div className={cn("p-1.5 sm:p-2 rounded-lg bg-muted/60 shrink-0", color)}>
+            <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </div>
         </div>
 
-        <div className="flex items-baseline gap-2 mb-2">
-          <span className="text-3xl font-extrabold tracking-tight font-mono-nums">{score}</span>
-          {typeof score === "number" && <span className="text-sm font-medium text-muted-foreground">{unit}</span>}
+        <div className="flex items-baseline gap-1 sm:gap-2 mb-1.5 sm:mb-2">
+          <span className="text-2xl sm:text-3xl font-extrabold tracking-tight font-mono-nums">{score}</span>
+          {typeof score === "number" && <span className="text-xs sm:text-sm font-medium text-muted-foreground">{unit}</span>}
         </div>
 
-        <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center justify-between text-xs gap-1 flex-wrap">
           {changePercent !== undefined ? (
             <Badge
               variant={isPositive ? "success" : isNegative ? "error" : "secondary"}
-              className="flex items-center gap-0.5 px-1.5 py-0 text-[11px] font-mono-nums"
+              className="flex items-center gap-0.5 px-1.5 py-0 text-[10px] sm:text-[11px] font-mono-nums"
             >
               {isPositive && <ArrowUpRight className="h-3 w-3" />}
               {isNegative && <ArrowDownRight className="h-3 w-3" />}
@@ -56,11 +56,11 @@ export function MetricCard({
               {isPositive ? `+${changePercent}%` : `${changePercent}%`}
             </Badge>
           ) : (
-            <span className="text-muted-foreground text-[11px] font-medium">Real-time</span>
+            <span className="text-muted-foreground text-[10px] sm:text-[11px] font-medium">Real-time</span>
           )}
 
           {previousScore !== undefined && (
-            <span className="text-muted-foreground text-[11px] font-mono-nums">
+            <span className="text-muted-foreground text-[10px] sm:text-[11px] font-mono-nums">
               vs prev: {previousScore}{unit}
             </span>
           )}

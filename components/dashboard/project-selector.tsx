@@ -28,15 +28,15 @@ export function ProjectSelector({ projects, selectedProjectId }: ProjectSelector
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="h-9 gap-2 px-3 text-xs bg-background">
+        <Button variant="outline" size="sm" className="h-9 gap-1.5 sm:gap-2 px-2.5 sm:px-3 text-xs bg-background">
           <div
             className="w-4 h-4 rounded-full flex items-center justify-center text-white text-[9px] font-bold shrink-0"
             style={{ background: selected?.color ?? "#6366f1" }}
           >
             {selected?.domain?.[0]?.toUpperCase() ?? "P"}
           </div>
-          <span className="font-semibold truncate max-w-[140px]">{selected?.name ?? "Select Project"}</span>
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground ml-1 shrink-0" />
+          <span className="font-semibold truncate max-w-[85px] sm:max-w-[140px]">{selected?.name ?? "Select Project"}</span>
+          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

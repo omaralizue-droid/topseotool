@@ -62,7 +62,7 @@ export default function BlogIndexPage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {post.description}
               </p>
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
                 <div className="flex items-center gap-2">
                   <img
                     src={post.author.avatar}
@@ -76,7 +76,7 @@ export default function BlogIndexPage() {
                 </div>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="text-xs font-semibold text-brand flex items-center gap-1 group-hover:translate-x-1 transition-transform"
+                  className="text-xs font-semibold text-brand flex items-center gap-1 group-hover:translate-x-1 transition-transform w-fit"
                 >
                   Read full article <ArrowRight className="h-3.5 w-3.5" />
                 </Link>

@@ -78,41 +78,44 @@ export default async function ProjectOverviewPage({ params }: Props) {
   })
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
-      <div className="flex items-start gap-4">
-        <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shrink-0"
-          style={{ background: project.color ?? "#6366f1" }}
-        >
-          {primaryDomain[0]?.toUpperCase()}
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight mb-1">{project.name}</h1>
-          <div className="flex items-center gap-2">
-            <a
-              href={`https://${primaryDomain}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-            >
-              <Globe className="h-3 w-3" />
-              {primaryDomain}
-            </a>
-            <Badge variant="outline" className="text-xs">{project.status}</Badge>
+    <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-2 border-b border-border/40">
+        <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+          <div
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white font-bold text-base sm:text-lg shrink-0 shadow-sm"
+            style={{ background: project.color ?? "#6366f1" }}
+          >
+            {primaryDomain[0]?.toUpperCase()}
           </div>
-          {project.description && (
-            <p className="text-sm text-muted-foreground mt-2">{project.description}</p>
-          )}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1 truncate">{project.name}</h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <a
+                href={`https://${primaryDomain}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 truncate"
+              >
+                <Globe className="h-3 w-3 shrink-0" />
+                <span className="truncate">{primaryDomain}</span>
+              </a>
+              {project.status && <Badge variant="outline" className="text-[10px] sm:text-xs">{project.status}</Badge>}
+            </div>
+            {project.description && (
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 line-clamp-2">{project.description}</p>
+            )}
+          </div>
         </div>
+
         {lastAudit && (
-          <div className="ml-auto text-right hidden sm:block">
-            <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1 justify-end">
+          <div className="sm:text-right shrink-0 p-3 sm:p-0 rounded-lg bg-muted/40 sm:bg-transparent border sm:border-0 border-border/60">
+            <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1 flex items-center gap-1 sm:justify-end">
               <Clock className="h-3 w-3" /> {formatRelativeTime(lastAudit.createdAt)}
             </p>
-            <div className="flex items-center gap-2 justify-end">
-              <span className="text-xs text-muted-foreground">Last SEO score</span>
+            <div className="flex items-center gap-2 sm:justify-end">
+              <span className="text-xs text-muted-foreground">Last SEO score:</span>
               {lastAudit.score !== null ? (
-                <span className="text-2xl font-bold font-mono-nums">{lastAudit.score}</span>
+                <span className="text-xl sm:text-2xl font-bold font-mono-nums">{lastAudit.score}</span>
               ) : (
                 <Badge variant="outline">Pending</Badge>
               )}
@@ -121,22 +124,22 @@ export default async function ProjectOverviewPage({ params }: Props) {
         )}
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {MODULES.map((mod) => (
           <Link
             key={mod.key}
             href={`/projects/${project.id}/${mod.key}`}
-            className="group flex items-start gap-3 p-4 bg-card border border-border rounded-lg hover:border-brand/40 hover:shadow-sm transition-all duration-150"
+            className="group flex items-start gap-3 p-3.5 sm:p-4 bg-card border border-border rounded-xl hover:border-brand/40 hover:shadow-sm transition-all duration-150"
           >
-            <div className="w-8 h-8 rounded-md bg-brand-muted flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-brand-muted flex items-center justify-center shrink-0">
               <mod.icon className="h-4 w-4 text-brand" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="font-medium text-sm">{mod.label}</span>
-                {mod.badge && <Badge variant="brand" className="text-[10px] py-0 px-1.5">{mod.badge}</Badge>}
+                <span className="font-semibold text-sm">{mod.label}</span>
+                {mod.badge && <Badge variant="brand" className="text-[9px] py-0 px-1.5">{mod.badge}</Badge>}
               </div>
-              <p className="text-xs text-muted-foreground">{mod.desc}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{mod.desc}</p>
             </div>
             <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors shrink-0 mt-0.5" />
           </Link>

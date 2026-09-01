@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function UseCasesIndexPage() {
   return (
-    <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 space-y-12 animate-fade-in">
+    <div className="py-12 sm:py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 animate-fade-in">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", item: "/" },
@@ -27,17 +27,17 @@ export default function UseCasesIndexPage() {
 
       {/* Header */}
       <div className="text-center space-y-3 max-w-2xl mx-auto">
-        <Badge variant="brand" className="mb-1">Solutions & Workflows</Badge>
+        <Badge variant="brand" className="mb-1">Solutions &amp; Workflows</Badge>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
           Tailored Use Cases
         </h1>
-        <p className="text-muted-foreground text-base">
+        <p className="text-muted-foreground text-sm sm:text-base">
           See how leading digital teams leverage TOPSEOTOOL to dominate traditional and AI-driven search experiences.
         </p>
       </div>
 
       {/* Use Cases Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {USE_CASES.map((uc) => (
           <Card key={uc.slug} className="flex flex-col justify-between hover:border-brand/40 transition-all hover:shadow-md bg-card">
             <CardHeader className="p-6">

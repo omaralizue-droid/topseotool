@@ -349,27 +349,29 @@ export default function AIAuditPage() {
   const citationsCount = allResults.reduce((a, r) => a + (r.citedUrls?.length ?? 0), 0)
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
+    <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-          <Link href={`/projects/${projectId}`}><ArrowLeft className="h-4 w-4" /></Link>
-        </Button>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight">AI Search Visibility Audit</h1>
-            <Badge variant="brand">6 Engines</Badge>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <Button variant="ghost" size="icon" asChild className="h-8 w-8 shrink-0">
+            <Link href={`/projects/${projectId}`}><ArrowLeft className="h-4 w-4" /></Link>
+          </Button>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight">AI Search Visibility Audit</h1>
+              <Badge variant="brand" className="text-[10px]">6 Engines</Badge>
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground">Test how your brand appears across ChatGPT, Gemini, Perplexity, Claude, Copilot &amp; Grok</p>
           </div>
-          <p className="text-sm text-muted-foreground">Test how your brand appears across ChatGPT, Gemini, Perplexity, Claude, Copilot & Grok</p>
         </div>
-        <Button variant="ghost" size="sm" className="ml-auto gap-2" onClick={() => refetch()}>
+        <Button variant="ghost" size="sm" className="w-fit gap-2 ml-auto sm:ml-0" onClick={() => refetch()}>
           <RefreshCw className="h-3.5 w-3.5" /> Refresh
         </Button>
       </div>
 
       {/* Stats overview */}
       {aiScans && aiScans.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
           {[
             { label: "Total Scans", value: aiScans.length, icon: <BarChart3 className="h-4 w-4" />, color: "text-blue-400" },
             { label: "Brand Mentions", value: totalMentions, icon: <MessageSquare className="h-4 w-4" />, color: "text-green-400" },

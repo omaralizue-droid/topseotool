@@ -29,12 +29,12 @@ export function AIVisibilityChart({ data = DEFAULT_DATA }: AIVisibilityChartProp
   return (
     <Card>
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Brain className="h-4 w-4 text-brand" />
-            AI Visibility Trend Across Engines
+            <Brain className="h-4 w-4 text-brand shrink-0" />
+            <span>AI Visibility Trend Across Engines</span>
           </CardTitle>
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-2.5 text-xs flex-wrap">
             <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block" /> Overall</span>
             <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" /> ChatGPT</span>
             <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block" /> Gemini</span>

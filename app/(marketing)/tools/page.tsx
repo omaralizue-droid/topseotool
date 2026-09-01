@@ -23,7 +23,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 export default function ToolsIndexPage() {
   return (
-    <div className="py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 space-y-12 animate-fade-in">
+    <div className="py-12 sm:py-16 md:py-24 max-w-6xl mx-auto px-4 sm:px-6 space-y-10 sm:space-y-12 animate-fade-in">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", item: "/" },
@@ -39,15 +39,15 @@ export default function ToolsIndexPage() {
       <div className="text-center space-y-3 max-w-2xl mx-auto">
         <Badge variant="brand" className="mb-1">100% Free Utilities</Badge>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-          Free SEO & AI Search Tools
+          Free SEO &amp; AI Search Tools
         </h1>
-        <p className="text-muted-foreground text-base">
+        <p className="text-muted-foreground text-sm sm:text-base">
           Professional web utilities designed for marketers, developers, and SEO specialists. No credit card required.
         </p>
       </div>
 
       {/* Tools Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {FREE_TOOLS.map((tool) => {
           const IconComponent = ICON_MAP[tool.iconName] || Globe
           return (

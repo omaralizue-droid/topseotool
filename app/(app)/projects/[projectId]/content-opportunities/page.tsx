@@ -45,17 +45,17 @@ export default function ProjectContentOpportunitiesPage() {
   })
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+    <div className="p-4 sm:p-6 md:p-8 max-w-5xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <Button variant="ghost" size="icon" asChild className="h-8 w-8 shrink-0">
           <Link href={`/projects/${projectId}`}><ArrowLeft className="h-4 w-4" /></Link>
         </Button>
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight">AI Content Opportunities</h1>
-            <Badge variant="brand">Strategic Planning</Badge>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight">AI Content Opportunities</h1>
+            <Badge variant="brand" className="text-[10px]">Strategic Planning</Badge>
           </div>
-          <p className="text-sm text-muted-foreground">Identify high-impact content topics to capture AI citation market share</p>
+          <p className="text-xs sm:text-sm text-muted-foreground">Identify high-impact content topics to capture AI citation market share</p>
         </div>
       </div>
 
@@ -64,11 +64,11 @@ export default function ProjectContentOpportunitiesPage() {
       ) : (
         <div className="space-y-4">
           {opportunities?.map((opp) => (
-            <Card key={opp.id} className="hover:border-brand/40 transition-all">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-4">
+            <Card key={opp.id} className="hover:border-brand/40 transition-all rounded-xl">
+              <CardHeader className="p-4 sm:p-6 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Badge variant={opp.priority === "CRITICAL" ? "error" : "brand"} className="text-[10px]">
                         {opp.priority} Priority
                       </Badge>
@@ -80,6 +80,7 @@ export default function ProjectContentOpportunitiesPage() {
                   <Button
                     size="sm"
                     variant="brand"
+                    className="w-full sm:w-auto shrink-0"
                     onClick={() => generateBrief.mutate(opp.id)}
                     disabled={generateBrief.isPending}
                   >
@@ -88,7 +89,7 @@ export default function ProjectContentOpportunitiesPage() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3 text-xs">
+              <CardContent className="p-4 sm:p-6 pt-0 space-y-3 text-xs">
                 <div className="p-3 rounded-lg bg-muted/40 border border-border/50">
                   <span className="font-semibold text-foreground">AI Visibility Opportunity:</span>
                   <p className="text-muted-foreground leading-relaxed mt-0.5">{opp.aiVisibilityOpportunity}</p>

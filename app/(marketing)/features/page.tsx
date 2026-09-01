@@ -26,32 +26,32 @@ const MODULES = [
 
 export default function FeaturesPage() {
   return (
-    <div className="py-20 md:py-28">
+    <div className="py-12 sm:py-20 md:py-28">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16">
-          <Badge variant="brand" className="mb-4">Complete Intelligence Suite</Badge>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            Built for modern SEO & AI search dominance
+        <div className="text-center mb-10 sm:mb-16">
+          <Badge variant="brand" className="mb-3 sm:mb-4">Complete Intelligence Suite</Badge>
+          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight mb-3 sm:mb-4">
+            Built for modern SEO &amp; AI search dominance
           </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm sm:text-lg max-w-2xl mx-auto">
             Traditional SEO tools leave you blind in AI search. TOPSEOTOOL bridges the gap.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16">
           {MODULES.map((m) => (
-            <div key={m.label} className="p-6 rounded-xl border border-border bg-card space-y-3">
+            <div key={m.label} className="p-5 sm:p-6 rounded-xl border border-border bg-card space-y-3 hover:border-brand/40 hover:shadow-sm transition-all">
               <div className="w-10 h-10 rounded-lg bg-brand-muted flex items-center justify-center text-brand">
                 <m.icon className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-lg">{m.label}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{m.desc}</p>
+              <h3 className="font-semibold text-base sm:text-lg">{m.label}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{m.desc}</p>
             </div>
           ))}
         </div>
 
         <div className="text-center">
-          <Button size="xl" asChild>
+          <Button size="xl" asChild className="w-full sm:w-auto">
             <Link href="/signup">Get started free <ArrowRight className="h-4 w-4 ml-2" /></Link>
           </Button>
         </div>

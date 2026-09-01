@@ -32,9 +32,9 @@ export function CompetitorComparison({
       <CardContent className="space-y-4">
         {/* Your Brand */}
         <div className="p-3 rounded-lg border border-brand/30 bg-brand-muted/30">
-          <div className="flex items-center justify-between text-xs font-semibold mb-1.5">
-            <span className="text-brand flex items-center gap-1 font-bold">★ Your Domain (TopSEOTool)</span>
-            <span className="font-mono-nums text-foreground">AI Vis: {myBrandVisibility}% | SEO: {myBrandScore}</span>
+          <div className="flex flex-col xs:flex-row xs:items-center justify-between text-xs font-semibold gap-1 mb-1.5">
+            <span className="text-brand flex items-center gap-1 font-bold">★ Your Domain</span>
+            <span className="font-mono-nums text-foreground text-[11px]">AI: {myBrandVisibility}% | SEO: {myBrandScore}</span>
           </div>
           <Progress value={myBrandVisibility} className="h-2 bg-brand/20" />
         </div>
@@ -51,9 +51,9 @@ export function CompetitorComparison({
         ) : (
           competitors.map((comp) => (
             <div key={comp.domain} className="space-y-1">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-medium text-foreground">{comp.name || comp.domain}</span>
-                <span className="text-muted-foreground font-mono-nums">AI Vis: {comp.aiVisibility}% | SEO: {comp.seoScore}</span>
+              <div className="flex items-center justify-between text-xs gap-2">
+                <span className="font-medium text-foreground truncate">{comp.name || comp.domain}</span>
+                <span className="text-muted-foreground font-mono-nums text-[11px] shrink-0">AI: {comp.aiVisibility}% | SEO: {comp.seoScore}</span>
               </div>
               <Progress value={comp.aiVisibility} className="h-1.5" />
             </div>

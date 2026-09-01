@@ -213,14 +213,14 @@ export default function BillingPage() {
     || (usage?.projectsUsed ?? 0) >= (usage?.projectsLimit ?? 1)
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-8 animate-fade-in">
+    <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-6 sm:space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/40">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight mb-1">Billing & Subscription</h1>
-          <p className="text-sm text-muted-foreground">Manage your plan, view usage, and update billing details.</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1">Billing &amp; Subscription</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Manage your plan, view usage, and update billing details.</p>
         </div>
-        <Button variant="outline" size="sm" asChild>
+        <Button variant="outline" size="sm" asChild className="w-fit">
           <Link href="/pricing">
             View all plans <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
           </Link>

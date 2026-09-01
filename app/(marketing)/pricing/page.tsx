@@ -34,19 +34,19 @@ export default function PricingPage() {
   const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">("monthly")
 
   return (
-    <div className="py-16 px-4 sm:px-6 max-w-7xl mx-auto space-y-16 animate-fade-in">
+    <div className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 max-w-7xl mx-auto space-y-12 sm:space-y-16 animate-fade-in">
       {/* Header */}
       <div className="text-center space-y-3 max-w-2xl mx-auto">
         <Badge variant="brand" className="mb-2">Transparent Subscription Pricing</Badge>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-          Invest in your brand&apos;s AI & search visibility
+          Invest in your brand&apos;s AI &amp; search visibility
         </h1>
-        <p className="text-base text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Measure, monitor, and optimize your presence across traditional Google search and AI engines like ChatGPT, Gemini, and Perplexity.
         </p>
 
         {/* Interval toggle */}
-        <div className="flex items-center justify-center gap-3 pt-6">
+        <div className="flex items-center justify-center gap-3 pt-4 sm:pt-6">
           <span className={`text-sm font-medium ${billingInterval === "monthly" ? "text-foreground font-semibold" : "text-muted-foreground"}`}>Monthly</span>
           <button
             type="button"
@@ -63,7 +63,7 @@ export default function PricingPage() {
       </div>
 
       {/* Pricing Cards Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {PLAN_ORDER.map((key) => {
           const plan = PLANS[key]
           const isPopular = plan.badge !== undefined

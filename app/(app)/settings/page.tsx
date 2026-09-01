@@ -15,10 +15,10 @@ export default async function SettingsPage() {
   if (!session?.user) redirect("/login")
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6 animate-fade-in">
+    <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight mb-1">Settings</h1>
-        <p className="text-sm text-muted-foreground">Manage your account credentials and preferences</p>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight mb-1">Settings</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">Manage your account credentials and preferences</p>
       </div>
 
       <Card>

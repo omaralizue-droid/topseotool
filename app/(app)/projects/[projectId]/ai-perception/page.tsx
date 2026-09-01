@@ -38,21 +38,21 @@ export default async function ProjectAIPerceptionPage({ params }: Props) {
   const analysis = analyzeBrandPerception(project.name, domain)
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <Button variant="ghost" size="icon" asChild className="h-8 w-8 shrink-0">
           <Link href={`/projects/${projectId}`}><ArrowLeft className="h-4 w-4" /></Link>
         </Button>
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight">AI Brand Perception</h1>
-            <Badge variant="brand">Module 6</Badge>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-lg sm:text-xl font-bold tracking-tight">AI Brand Perception</h1>
+            <Badge variant="brand" className="text-[10px]">Module 6</Badge>
           </div>
-          <p className="text-sm text-muted-foreground">Qualitative perception profiling across LLMs for {project.name}</p>
+          <p className="text-xs sm:text-sm text-muted-foreground">Qualitative perception profiling across LLMs for {project.name}</p>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         <MetricCard
           title="Brand Perception Score"
           score={analysis.perceptionScore}
