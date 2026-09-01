@@ -110,9 +110,9 @@ function EngineRadarChart({
   competitorName?: string
 }) {
   const engines = ["CHATGPT", "GEMINI", "PERPLEXITY", "CLAUDE", "COPILOT", "GROK"]
-  const size = 260
+  const size = 220
   const center = size / 2
-  const radius = 90
+  const radius = 74
 
   const getCoordinates = (index: number, total: number, valuePercent: number) => {
     const angle = (Math.PI * 2 / total) * index - Math.PI / 2
@@ -142,8 +142,8 @@ function EngineRadarChart({
     : null
 
   return (
-    <div className="flex flex-col items-center">
-      <svg width={size} height={size} className="overflow-visible">
+    <div className="flex flex-col items-center w-full max-w-full">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible max-w-full h-auto">
         {/* Radar concentric rings */}
         {[0.25, 0.5, 0.75, 1].map((scale, i) => (
           <polygon
@@ -417,12 +417,12 @@ function ResultsPanel({ result, onReset }: { result: PublicScanResult; onReset: 
             </span>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
             {/* Primary Brand */}
-            <div className="text-center md:text-left space-y-2">
+            <div className="text-center space-y-2">
               <span className="text-xs font-mono text-indigo-400 uppercase font-bold tracking-widest">Primary Brand</span>
               <h3 className="text-2xl font-black text-white">{result.brandName}</h3>
-              <div className="flex items-center gap-3 justify-center md:justify-start">
+              <div className="flex items-center gap-3 justify-center">
                 <ScoreGauge score={metrics.overallVisibilityScore} size={90} label="Score" />
                 <div className="text-left font-mono text-xs text-white/60 space-y-1">
                   <div>Mentions: <span className="text-white font-bold">{metrics.mentionRate}%</span></div>
@@ -432,8 +432,9 @@ function ResultsPanel({ result, onReset }: { result: PublicScanResult; onReset: 
               </div>
             </div>
 
+
             {/* Battle Verdict in Center */}
-            <div className="text-center py-4 border-y md:border-y-0 md:border-x border-white/10 px-4 space-y-3">
+            <div className="text-center py-4 border-y border-white/10 px-4 space-y-3">
               <div className="w-12 h-12 rounded-full mx-auto flex items-center justify-center bg-white/5 border border-white/10">
                 <Swords size={22} className="text-amber-400" />
               </div>
@@ -455,10 +456,10 @@ function ResultsPanel({ result, onReset }: { result: PublicScanResult; onReset: 
             </div>
 
             {/* Competitor Brand */}
-            <div className="text-center md:text-right space-y-2">
+            <div className="text-center space-y-2">
               <span className="text-xs font-mono text-red-400 uppercase font-bold tracking-widest">Competitor</span>
               <h3 className="text-2xl font-black text-white">{result.competitorBrand}</h3>
-              <div className="flex items-center gap-3 justify-center md:justify-end">
+              <div className="flex items-center gap-3 justify-center">
                 <div className="text-right font-mono text-xs text-white/60 space-y-1">
                   <div>Mentions: <span className="text-white font-bold">{competitorMetrics.mentionRate}%</span></div>
                   <div>Citations: <span className="text-white font-bold">{competitorMetrics.citationRate}%</span></div>
@@ -473,7 +474,7 @@ function ResultsPanel({ result, onReset }: { result: PublicScanResult; onReset: 
 
       {/* Main Single Score + Radar Overview (If Single Mode) */}
       {!isBattle && (
-        <div className="grid md:grid-cols-3 gap-6 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 items-stretch">
           {/* Main Score Gauge */}
           <div
             className="rounded-3xl p-6 md:p-8 flex flex-col items-center justify-center text-center border relative"
@@ -528,7 +529,7 @@ function ResultsPanel({ result, onReset }: { result: PublicScanResult; onReset: 
 
       {/* Interactive Tabs */}
       <div className="space-y-6">
-        <div className="flex items-center gap-2 border-b border-white/10 pb-2 overflow-x-auto">
+        <div className="flex items-center gap-1 sm:gap-2 border-b border-white/10 pb-2 overflow-x-auto scrollbar-thin">
           {[
             { key: "breakdown", label: "Engine Breakdown (6 Models)", icon: <Brain size={14} /> },
             ...(isBattle ? [{ key: "arena", label: "⚔️ Head-to-Head Arena", icon: <Swords size={14} /> }] : []),
@@ -538,20 +539,20 @@ function ResultsPanel({ result, onReset }: { result: PublicScanResult; onReset: 
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-semibold transition-all shrink-0 ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 rounded-xl text-[11px] sm:text-xs font-mono font-semibold transition-all shrink-0 ${
                 activeTab === tab.key
                   ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
                   : "text-white/50 hover:text-white hover:bg-white/5"
               }`}
             >
-              {tab.icon} {tab.label}
+              {tab.icon} <span className="hidden xs:inline sm:inline">{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* Tab 1: Engine Breakdown */}
         {activeTab === "breakdown" && (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {metrics.perEngineStats.map((stat, i) => (
               <EngineCard
                 key={stat.engine}
@@ -627,7 +628,7 @@ function ResultsPanel({ result, onReset }: { result: PublicScanResult; onReset: 
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               {aeoPlaybook.recommendations.map((rec, i) => (
                 <div
                   key={i}
@@ -720,7 +721,7 @@ function ResultsPanel({ result, onReset }: { result: PublicScanResult; onReset: 
 
       {/* Share / Social Proof Card */}
       <div
-        className="rounded-3xl p-6 md:p-8 border flex flex-col sm:flex-row items-center justify-between gap-6"
+        className="rounded-3xl p-5 sm:p-6 md:p-8 border flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6"
         style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(168,85,247,0.1) 100%)", borderColor: "rgba(99,102,241,0.3)" }}
       >
         <div className="space-y-1 text-center sm:text-left">
@@ -893,7 +894,7 @@ export default function AIVisibilityCheckerPage() {
         background: "radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.18) 0%, rgba(15,15,25,0.98) 65%, #030307 100%)",
       }}
     >
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
         <AnimatePresence mode="wait">
           {status === "idle" && (
             <motion.div
@@ -916,7 +917,7 @@ export default function AIVisibilityCheckerPage() {
 
               {/* Main Headline */}
               <div className="space-y-4 max-w-3xl mx-auto">
-                <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-[1.1]">
+                <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-white tracking-tight leading-[1.1]">
                   Where Does AI Search
                   <br />
                   <span
@@ -932,35 +933,35 @@ export default function AIVisibilityCheckerPage() {
               </div>
 
               {/* Mode Switcher */}
-              <div className="inline-flex items-center p-1 rounded-2xl bg-white/5 border border-white/10">
+              <div className="inline-flex items-center p-1 rounded-2xl bg-white/5 border border-white/10 w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setMode("single")}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
+                  className={`flex items-center justify-center gap-2 flex-1 sm:flex-none px-3 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
                     mode === "single"
                       ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/30"
                       : "text-white/50 hover:text-white"
                   }`}
                 >
-                  <Globe size={14} /> Single Domain Scan
+                  <Globe size={14} /> <span className="hidden xs:inline">Single Domain Scan</span><span className="xs:hidden">Single</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setMode("battle")}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
+                  className={`flex items-center justify-center gap-2 flex-1 sm:flex-none px-3 sm:px-5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
                     mode === "battle"
                       ? "bg-gradient-to-r from-red-600 to-amber-600 text-white shadow-lg shadow-red-600/30"
                       : "text-white/50 hover:text-white"
                   }`}
                 >
-                  <Swords size={14} /> ⚔️ AI Battle Mode (Vs Competitor)
+                  <Swords size={14} /> <span className="hidden sm:inline">⚔️ AI Battle Mode (Vs Competitor)</span><span className="sm:hidden">⚔️ Battle</span>
                 </button>
               </div>
 
               {/* Interactive Input Form */}
               <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-3">
                 <div
-                  className="rounded-2xl border p-2 flex flex-col sm:flex-row items-center gap-2 transition-all focus-within:border-indigo-500/60 shadow-[0_0_60px_rgba(99,102,241,0.12)]"
+                  className="rounded-2xl border p-2 flex flex-col gap-2 transition-all focus-within:border-indigo-500/60 shadow-[0_0_60px_rgba(99,102,241,0.12)]"
                   style={{ background: "rgba(10,10,18,0.75)", borderColor: "rgba(255,255,255,0.12)" }}
                 >
                   <div className="flex items-center gap-2 w-full px-3 py-2">
@@ -976,7 +977,7 @@ export default function AIVisibilityCheckerPage() {
                   </div>
 
                   {mode === "battle" && (
-                    <div className="flex items-center gap-2 w-full px-3 py-2 border-t sm:border-t-0 sm:border-l border-white/10">
+                    <div className="flex items-center gap-2 w-full px-3 py-2 border-t border-white/10">
                       <Swords size={18} className="text-red-400 shrink-0" />
                       <input
                         type="text"
@@ -991,7 +992,7 @@ export default function AIVisibilityCheckerPage() {
                   <button
                     type="submit"
                     disabled={!inputUrl.trim() || (mode === "battle" && !competitorUrl.trim())}
-                    className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold text-white transition-all hover:scale-105 active:scale-100 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 shrink-0"
+                    className="w-full px-7 py-3.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold text-white transition-all hover:scale-105 active:scale-100 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 shrink-0"
                     style={{
                       background: mode === "battle" ? "linear-gradient(135deg, #ef4444, #f59e0b)" : "linear-gradient(135deg, #6366f1, #8b5cf6)",
                     }}

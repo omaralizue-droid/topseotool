@@ -15,6 +15,7 @@ import {
   Plus,
   PanelLeftClose,
   PanelLeft,
+  X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -25,9 +26,11 @@ interface AppSidebarProps {
   collapsed: boolean
   onToggle: () => void
   activeProjectId?: string
+  isMobileDrawer?: boolean
+  onMobileClose?: () => void
 }
 
-export function AppSidebar({ collapsed, onToggle, activeProjectId }: AppSidebarProps) {
+export function AppSidebar({ collapsed, onToggle, activeProjectId, isMobileDrawer, onMobileClose }: AppSidebarProps) {
   const pathname = usePathname()
 
   const projectPrefix = activeProjectId ? `/projects/${activeProjectId}` : null
@@ -58,7 +61,8 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId }: AppSidebarP
       <aside
         className={cn(
           "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-all duration-200 ease-in-out",
-          collapsed ? "w-[60px]" : "w-[240px]"
+          // On mobile drawer: always full width (not collapsed), fixed height fills viewport
+          isMobileDrawer ? "w-[260px] h-screen" : (collapsed ? "w-[60px]" : "w-[240px]")
         )}
       >
         {/* Logo */}
@@ -67,36 +71,50 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId }: AppSidebarP
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-brand text-brand-foreground font-bold text-sm shrink-0 select-none shadow-brand">
               T
             </div>
-            {!collapsed && (
+            {(!collapsed || isMobileDrawer) && (
               <span className="font-bold text-sm tracking-tight truncate text-sidebar-foreground">
                 TOPSEOTOOL
               </span>
             )}
           </Link>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="ml-auto h-7 w-7 text-muted-foreground hover:text-foreground"
-            onClick={onToggle}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-          </Button>
+          {isMobileDrawer ? (
+            // Mobile drawer: show X close button
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-auto h-7 w-7 text-muted-foreground hover:text-foreground"
+              onClick={onMobileClose}
+              aria-label="Close sidebar"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          ) : (
+            // Desktop: show collapse/expand toggle
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-auto h-7 w-7 text-muted-foreground hover:text-foreground"
+              onClick={onToggle}
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+            </Button>
+          )}
         </div>
 
         <ScrollArea className="flex-1 py-3 px-2">
-          <nav className="space-y-1">
+          <nav className="space-y-0.5">
             {mainNav.map((item) => (
               <NavItem
                 key={item.label}
                 {...item}
                 active={isActive(item.href)}
-                collapsed={collapsed}
+                collapsed={collapsed && !isMobileDrawer}
               />
             ))}
           </nav>
 
-          {!collapsed && (
+          {(!collapsed || isMobileDrawer) && (
             <div className="mt-4 pt-4 border-t border-sidebar-border">
               <Link
                 href="/projects/new"
@@ -110,13 +128,13 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId }: AppSidebarP
         </ScrollArea>
 
         {/* Bottom nav */}
-        <div className="px-2 py-2 space-y-1 border-t border-sidebar-border shrink-0">
+        <div className="px-2 py-2 space-y-0.5 border-t border-sidebar-border shrink-0">
           {bottomNav.map((item) => (
             <NavItem
               key={item.label}
               {...item}
               active={isActive(item.href)}
-              collapsed={collapsed}
+              collapsed={collapsed && !isMobileDrawer}
             />
           ))}
         </div>

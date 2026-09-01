@@ -156,19 +156,19 @@ export default async function DashboardPage() {
   }))
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
       {/* Hero Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/40">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-2 border-b border-border/40">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight mb-1">
             {greeting}, {firstName}
           </h1>
           <p className="text-sm text-muted-foreground">
-            Here&apos;s how your search & AI visibility is performing.
+            Here&apos;s how your search &amp; AI visibility is performing.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <ProjectSelector projects={formattedProjects} selectedProjectId={primaryProject.id} />
           <Button size="sm" variant="brand" asChild>
             <Link href={`/projects/${primaryProject.id}/seo-audit`}>
@@ -215,8 +215,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* Grid Row 1: AI Visibility Chart & Competitor Benchmark */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        <div className="md:col-span-2">
           <AIVisibilityChart />
         </div>
         <div>
@@ -229,13 +229,13 @@ export default async function DashboardPage() {
       </div>
 
       {/* Grid Row 2: Top Mentions & Recent Citations */}
-      <div className="grid sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <TopMentions mentions={formattedMentions} />
         <RecentCitations citations={formattedCitations} />
       </div>
 
       {/* Grid Row 3: Critical Issues & Recommendations */}
-      <div className="grid sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <CriticalIssues issues={criticalIssues} projectId={primaryProject.id} />
         <AIRecommendations recommendations={formattedRecs} />
       </div>

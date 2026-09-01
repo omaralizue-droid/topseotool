@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react"
-import { Bell, Search, HelpCircle, Building2, ChevronDown, Check, LogOut, Settings, CreditCard } from "lucide-react"
+import { Bell, Search, HelpCircle, Building2, ChevronDown, Check, LogOut, Settings, CreditCard, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -26,25 +26,39 @@ interface TopBarProps {
   }
   organizations?: Array<{ id: string; name: string; slug: string }>
   activeOrgId?: string
+  onMobileMenuOpen?: () => void
 }
 
-export function TopBar({ user, organizations = [], activeOrgId }: TopBarProps) {
+export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen }: TopBarProps) {
   const [activeOrg, setActiveOrg] = useState(
     organizations.find((o) => o.id === activeOrgId) ?? organizations[0] ?? { id: "default", name: "My Organization", slug: "my-org" }
   )
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
 
   return (
-    <header className="h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-4 gap-3 shrink-0 z-30">
+    <header className="h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-3 sm:px-4 gap-2 sm:gap-3 shrink-0 z-30">
+
+      {/* Hamburger — mobile only */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden h-8 w-8 text-muted-foreground hover:text-foreground shrink-0"
+        onClick={onMobileMenuOpen}
+        aria-label="Open navigation"
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+
       {/* Organization Selector */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-8 gap-2 px-2 text-xs font-medium hover:bg-accent border border-border/50">
-            <div className="w-5 h-5 rounded bg-brand-muted text-brand flex items-center justify-center font-bold text-[10px]">
+          <Button variant="ghost" size="sm" className="h-8 gap-1.5 px-2 text-xs font-medium hover:bg-accent border border-border/50 max-w-[130px] sm:max-w-none">
+            <div className="w-5 h-5 rounded bg-brand-muted text-brand flex items-center justify-center font-bold text-[10px] shrink-0">
               {activeOrg.name[0]?.toUpperCase()}
             </div>
-            <span className="truncate max-w-[120px] font-semibold">{activeOrg.name}</span>
-            <ChevronDown className="h-3 w-3 text-muted-foreground ml-1 shrink-0" />
+            <span className="truncate max-w-[70px] sm:max-w-[120px] font-semibold">{activeOrg.name}</span>
+            <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-56">
@@ -67,18 +81,54 @@ export function TopBar({ user, organizations = [], activeOrgId }: TopBarProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Global Search */}
-      <div className="relative flex-1 max-w-sm ml-2">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-        <Input
-          placeholder="Search projects, audits, mentions..."
-          className="pl-8 h-8 text-xs bg-muted/40 border-border/60 focus-visible:ring-1"
-        />
-      </div>
+      {/* Global Search — hidden on mobile, expandable */}
+      {searchOpen ? (
+        <div className="flex items-center gap-2 flex-1 sm:flex-none sm:w-auto">
+          <div className="relative flex-1 sm:max-w-sm">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              autoFocus
+              placeholder="Search projects, audits, mentions..."
+              className="pl-8 h-8 text-xs bg-muted/40 border-border/60 focus-visible:ring-1"
+              onBlur={() => setSearchOpen(false)}
+            />
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 sm:hidden text-muted-foreground"
+            onClick={() => setSearchOpen(false)}
+            aria-label="Close search"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      ) : (
+        <>
+          {/* Desktop search bar */}
+          <div className="relative hidden sm:flex flex-1 max-w-sm ml-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search projects, audits, mentions..."
+              className="pl-8 h-8 text-xs bg-muted/40 border-border/60 focus-visible:ring-1"
+            />
+          </div>
+          {/* Mobile search icon */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="sm:hidden h-8 w-8 text-muted-foreground hover:text-foreground"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search"
+          >
+            <Search className="h-4 w-4" />
+          </Button>
+        </>
+      )}
 
-      <div className="ml-auto flex items-center gap-1.5">
-        {/* Help Link */}
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground" asChild>
+      <div className="ml-auto flex items-center gap-1">
+        {/* Help Link — hidden on small mobile */}
+        <Button variant="ghost" size="icon" className="hidden sm:flex h-8 w-8 text-muted-foreground hover:text-foreground" asChild>
           <Link href="/blog" title="Help & Guides">
             <HelpCircle className="h-4 w-4" />
           </Link>
@@ -92,7 +142,7 @@ export function TopBar({ user, organizations = [], activeOrgId }: TopBarProps) {
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-brand animate-pulse" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
+          <DropdownMenuContent align="end" className="w-72 sm:w-80">
             <DropdownMenuLabel className="flex items-center justify-between">
               <span>Notifications</span>
               <span className="text-[10px] text-brand bg-brand-muted px-2 py-0.5 rounded font-semibold">New</span>
@@ -114,7 +164,7 @@ export function TopBar({ user, organizations = [], activeOrgId }: TopBarProps) {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full ml-1" aria-label="User menu">
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full ml-0.5" aria-label="User menu">
               <Avatar className="h-7 w-7">
                 <AvatarImage src={user.image ?? undefined} alt={user.name ?? "User"} />
                 <AvatarFallback className="text-xs bg-brand text-brand-foreground font-semibold">
