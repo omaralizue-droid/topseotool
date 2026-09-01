@@ -8,6 +8,8 @@ import {
   TrendingUp, Search, BarChart3
 } from "lucide-react"
 
+import { ThreeHeroGlobe } from "@/components/marketing/three-hero-globe"
+
 export const metadata: Metadata = {
   title: "AI Search & SEO Intelligence Platform | TOPSEOTOOL",
   description: "Measure and improve your visibility across traditional search engines and AI-powered search experiences.",
@@ -42,43 +44,65 @@ const AUDIENCE = [
 export default function LandingPage() {
   return (
     <div className="flex flex-col">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-background pt-16 pb-20 sm:pt-20 sm:pb-24 md:pt-28 md:pb-32">
-        <div className="absolute inset-0 bg-grid-subtle opacity-60" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] sm:w-[500px] md:w-[700px] h-[300px] sm:h-[350px] md:h-[400px] bg-brand/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 text-center">
-          <Badge variant="brand" className="mb-5 sm:mb-6 text-xs px-3 py-1">
-            Now tracking AI Search Visibility across 6 major AI engines
-          </Badge>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-balance mb-5 sm:mb-6 leading-[1.1]">
-            SEO &amp; AI Search
-            <br />
-            <span className="text-brand-gradient">Intelligence Platform</span>
-          </h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-7 sm:mb-8 text-pretty px-2">
-            Measure and improve your visibility across traditional search engines and
-            AI-powered search experiences — from one professional platform.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button size="xl" asChild className="w-full sm:w-auto">
-              <Link href="/signup">
-                Start your free audit <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button size="xl" variant="outline" asChild className="w-full sm:w-auto">
-              <Link href="/pricing">View pricing</Link>
-            </Button>
-          </div>
-          <p className="mt-4 text-xs text-muted-foreground">No credit card required for the first audit</p>
+      {/* Hero Section with Three.js 3D Constellation Header */}
+      <section className="relative overflow-hidden bg-background pt-12 pb-16 sm:pt-16 sm:pb-20 md:pt-20 md:pb-28">
+        <div className="absolute inset-0 bg-grid-subtle opacity-60 pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[350px] sm:w-[600px] md:w-[850px] h-[350px] sm:h-[450px] md:h-[550px] bg-brand/10 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Stats */}
-          <div className="mt-12 sm:mt-16 grid grid-cols-3 gap-3 sm:gap-6 max-w-sm sm:max-w-lg mx-auto">
-            {STATS.map((s) => (
-              <div key={s.label} className="text-center">
-                <p className="text-xl sm:text-2xl font-bold text-foreground font-mono-nums">{s.value}</p>
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 leading-tight">{s.label}</p>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center">
+            {/* Left Hero Content */}
+            <div className="lg:col-span-7 text-center lg:text-left space-y-5 sm:space-y-6">
+              <Badge variant="brand" className="text-xs px-3.5 py-1 w-fit mx-auto lg:mx-0 shadow-sm">
+                ✨ 3D AI Search Visibility Engine Across 6 Major LLMs
+              </Badge>
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-balance leading-[1.1]">
+                SEO &amp; AI Search
+                <br />
+                <span className="text-brand-gradient">Intelligence Platform</span>
+              </h1>
+              <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0 text-pretty leading-relaxed">
+                Measure, monitor, and optimize your presence across traditional search engines and
+                AI-powered search experiences (ChatGPT, Gemini, Perplexity, Claude, Copilot &amp; Grok) in real time.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-1">
+                <Button size="xl" asChild className="w-full sm:w-auto shadow-lg shadow-brand/20">
+                  <Link href="/signup">
+                    Start your free audit <ArrowRight className="h-4 w-4 ml-1" />
+                  </Link>
+                </Button>
+                <Button size="xl" variant="outline" asChild className="w-full sm:w-auto">
+                  <Link href="/pricing">View pricing</Link>
+                </Button>
               </div>
-            ))}
+              <p className="text-xs text-muted-foreground">No credit card required • Instant automated crawl</p>
+
+              {/* Stats Bar */}
+              <div className="pt-4 sm:pt-6 grid grid-cols-3 gap-3 sm:gap-6 max-w-md mx-auto lg:mx-0 border-t border-border/50">
+                {STATS.map((s) => (
+                  <div key={s.label} className="text-center lg:text-left">
+                    <p className="text-xl sm:text-2xl font-extrabold text-foreground font-mono-nums">{s.value}</p>
+                    <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 leading-tight">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Three.js Interactive 3D AI Knowledge Globe */}
+            <div className="lg:col-span-5 relative flex items-center justify-center">
+              <div className="relative w-full max-w-[420px] sm:max-w-[480px] lg:max-w-none h-[340px] sm:h-[420px] md:h-[480px] rounded-3xl bg-gradient-to-b from-brand/5 via-card/40 to-card/80 border border-border/80 backdrop-blur-sm p-2 shadow-2xl shadow-brand/5 overflow-hidden group">
+                <div className="absolute top-3 left-4 z-10 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="text-[11px] font-mono font-semibold text-muted-foreground uppercase tracking-wider">
+                    Interactive 3D AI Graph
+                  </span>
+                </div>
+                <div className="absolute bottom-3 right-4 z-10 text-[10px] text-muted-foreground font-mono bg-background/80 px-2 py-1 rounded-md border border-border">
+                  Rotate &amp; Orbit with Cursor
+                </div>
+                <ThreeHeroGlobe className="w-full h-full" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
