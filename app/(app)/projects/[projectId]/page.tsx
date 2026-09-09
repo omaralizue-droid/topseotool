@@ -9,7 +9,7 @@ import {
   TrendingUp, ShieldCheck, Sparkles, CheckCircle2,
   RefreshCw, Download, Share2, Play, ChevronRight,
   BarChart3, Activity, Target, ArrowUpRight, Award,
-  SlidersHorizontal, Check
+  SlidersHorizontal, Check, Search, FileEdit
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -108,6 +108,84 @@ export default function ProjectOverviewPage() {
 
   const SUITES = [
     {
+      category: "Organic Research & Keyword Intelligence",
+      badge: "Core SEO",
+      description: "Keyword volume research, daily rank tracking, and backlink profile auditing",
+      tools: [
+        {
+          key: "keywords",
+          label: "Keyword Explorer",
+          icon: Search,
+          desc: "Search volumes (US/Global), KD% difficulty, intent tags & top 10 SERP breakdown",
+          badge: "New",
+          stats: "18.1K Vol"
+        },
+        {
+          key: "rank-tracker",
+          label: "Daily Rank Tracker",
+          icon: TrendingUp,
+          desc: "Automated daily positions, Google AI Overview detection & volatility radar",
+          badge: "Active",
+          stats: "Top 3: 14"
+        },
+        {
+          key: "backlinks",
+          label: "Backlink Intelligence",
+          icon: Link2,
+          desc: "Domain Rating (DR), live link database, anchor text distribution & toxic link audit",
+          badge: "New",
+          stats: "DR 84"
+        },
+        {
+          key: "content-opportunities",
+          label: "Content Opportunities",
+          icon: Layers,
+          desc: "High-intent keyword gaps and AI-generated content clusters",
+          badge: null,
+          stats: "12 Ideas"
+        }
+      ]
+    },
+    {
+      category: "Technical Audits & Content Optimization",
+      badge: "On-Page & Health",
+      description: "Deep crawl diagnostics, Core Web Vitals, and real-time SEO writing assistant",
+      tools: [
+        {
+          key: "seo-audit",
+          label: "Technical SEO Audit",
+          icon: Globe,
+          desc: "Crawl diagnostics, Core Web Vitals, schema markup & server status",
+          badge: "Health 94",
+          stats: "0 Critical"
+        },
+        {
+          key: "content-optimizer",
+          label: "Content Optimizer",
+          icon: FileEdit,
+          desc: "Real-time live SEO score editor, NLP/LSI keyword recommendations & readability",
+          badge: "AI Scorer",
+          stats: "Score 82"
+        },
+        {
+          key: "competitors",
+          label: "Competitor Intelligence",
+          icon: Users2,
+          desc: "Organic keyword overlap, content delta and domain authority comparison",
+          badge: "3 Rivals",
+          stats: "+14% Gap"
+        },
+        {
+          key: "recommendations",
+          label: "Prioritized Action Plan",
+          icon: Lightbulb,
+          desc: "Impact vs effort matrix with automated step-by-step code fixes",
+          badge: "High ROI",
+          stats: "6 Ready"
+        }
+      ]
+    },
+    {
       category: "AEO & Generative Engine Optimization",
       badge: "AI Powered",
       description: "Manage visibility across ChatGPT, Claude, Perplexity & Google Gemini",
@@ -143,45 +221,6 @@ export default function ProjectOverviewPage() {
           desc: "Discover high-authority domains feeding AI answers & knowledge graphs",
           badge: null,
           stats: "84 Sources"
-        }
-      ]
-    },
-    {
-      category: "Technical SEO & Market Dominance",
-      badge: "Organic Growth",
-      description: "High-precision site audit, Core Web Vitals and competitive intelligence",
-      tools: [
-        {
-          key: "seo-audit",
-          label: "Technical SEO Audit",
-          icon: Globe,
-          desc: "Crawl diagnostics, Core Web Vitals, schema markup & server status",
-          badge: "Health 94",
-          stats: "0 Critical"
-        },
-        {
-          key: "competitors",
-          label: "Competitor Intelligence",
-          icon: Users2,
-          desc: "Organic keyword overlap, content delta and domain authority comparison",
-          badge: "3 Rivals",
-          stats: "+14% Gap"
-        },
-        {
-          key: "content-opportunities",
-          label: "Content Opportunities",
-          icon: Layers,
-          desc: "High-intent keyword gaps and AI-generated content clusters",
-          badge: "12 Ideas",
-          stats: "18.4K Vol"
-        },
-        {
-          key: "recommendations",
-          label: "Prioritized Action Plan",
-          icon: Lightbulb,
-          desc: "Impact vs effort matrix with automated step-by-step code fixes",
-          badge: "High ROI",
-          stats: "6 Ready"
         }
       ]
     },
