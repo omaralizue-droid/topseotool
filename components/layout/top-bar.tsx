@@ -342,6 +342,9 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
                 <Link href="/settings"><Settings className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Account & API Keys</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="cursor-pointer text-xs px-2.5 py-2 rounded-md">
+                <Link href="/settings/team"><Building2 className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Team & Workspace Access</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="cursor-pointer text-xs px-2.5 py-2 rounded-md">
                 <Link href="/billing"><CreditCard className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Subscription & Invoices</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>

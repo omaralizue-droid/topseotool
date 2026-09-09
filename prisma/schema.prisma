@@ -22,6 +22,7 @@ enum UserRole {
 enum OrgRole {
   OWNER
   ADMIN
+  MANAGER
   MEMBER
 }
 
