@@ -3,7 +3,7 @@
 // Protects state-changing browser mutations against Cross-Site Request Forgery
 // ============================================================
 
-import crypto from "crypto"
+// Note: No Node.js crypto import — uses Web-compatible APIs only (Edge Runtime safe)
 
 /**
  * Validates the Origin and Referer headers of an incoming mutation request (POST, PUT, PATCH, DELETE).
@@ -81,13 +81,22 @@ export function validateCsrfOrigin(request: Request): { valid: boolean; reason?:
 
 /**
  * Constant-time token verification to eliminate timing attacks.
+ * Uses TextEncoder for Edge Runtime compatibility (no Node.js crypto dependency).
  */
 export function verifyCsrfToken(providedToken: string, expectedToken: string): boolean {
   if (!providedToken || !expectedToken) return false
   if (providedToken.length !== expectedToken.length) return false
 
-  const bufProvided = Buffer.from(providedToken, "utf8")
-  const bufExpected = Buffer.from(expectedToken, "utf8")
+  const enc = new TextEncoder()
+  const a = enc.encode(providedToken)
+  const b = enc.encode(expectedToken)
 
-  return crypto.timingSafeEqual(bufProvided, bufExpected)
+  if (a.length !== b.length) return false
+
+  // XOR-based constant-time comparison
+  let diff = 0
+  for (let i = 0; i < a.length; i++) {
+    diff |= a[i] ^ b[i]
+  }
+  return diff === 0
 }

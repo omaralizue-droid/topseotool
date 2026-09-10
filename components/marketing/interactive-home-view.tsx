@@ -540,7 +540,7 @@ export function InteractiveHomeView() {
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Automated daily background rank tracking without manual syncs
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Instant alert notification triggers when keywords drop >= 3 spots
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Instant alert notification triggers when keywords drop {'>='} 3 spots
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-500" /> City-level and country-level precision across 190+ geographies

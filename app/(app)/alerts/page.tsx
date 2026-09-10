@@ -218,16 +218,16 @@ export default function AlertsPage() {
                     onChange={(e) => {
                       const val = e.target.value as any
                       setNewRuleTrigger(val)
-                      if (val === "RANKING_DROP") setNewRuleThreshold("Keyword falls by >= 3 positions or exits Top 10")
-                      else if (val === "HEALTH_DECREASE") setNewRuleThreshold("Technical health score drops by >= 5 points")
+                      if (val === "RANKING_DROP") setNewRuleThreshold("Keyword falls by \u003e= 3 positions or exits Top 10")
+                      else if (val === "HEALTH_DECREASE") setNewRuleThreshold("Technical health score drops by \u003e= 5 points")
                       else if (val === "PAGE_UNAVAILABLE") setNewRuleThreshold("Monitored URL returns HTTP 4xx, 5xx, or timeout")
                       else if (val === "BACKLINK_LOST") setNewRuleThreshold("High-impact referring domain or dofollow backlink lost")
-                      else if (val === "KEYWORD_IMPROVED") setNewRuleThreshold("Keyword moves up by >= 5 spots or enters Top 3")
+                      else if (val === "KEYWORD_IMPROVED") setNewRuleThreshold("Keyword moves up by \u003e= 5 spots or enters Top 3")
                     }}
                     className="w-full h-9 px-3 rounded-md bg-muted/30 border border-border/60 text-xs font-medium text-foreground focus:outline-none"
                   >
-                    <option value="RANKING_DROP">Ranking drops (>= 3 spots / drops off page 1)</option>
-                    <option value="HEALTH_DECREASE">Website health decreases (>= 5 pts)</option>
+                    <option value="RANKING_DROP">Ranking drops ({'>='} 3 spots / drops off page 1)</option>
+                    <option value="HEALTH_DECREASE">Website health decreases ({'>='} 5 pts)</option>
                     <option value="PAGE_UNAVAILABLE">Important page becomes unavailable (4xx/5xx/timeout)</option>
                     <option value="BACKLINK_LOST">Backlinks are lost (referring domain / dofollow)</option>
                     <option value="KEYWORD_IMPROVED">Keywords improve significantly (+5 spots / Top 3)</option>
