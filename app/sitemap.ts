@@ -3,6 +3,7 @@ import { BLOG_POSTS } from "@/lib/content/blog-data"
 import { FREE_TOOLS } from "@/lib/content/tools-data"
 import { USE_CASES } from "@/lib/content/use-cases-data"
 import { RESOURCES } from "@/lib/content/resources-data"
+import { getAllProgrammaticPages } from "@/lib/seo/programmatic-seo"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://topseotool.net"
@@ -110,11 +111,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }))
 
+  // Dedicated Programmatic SEO Landing Pages
+  const programmaticRoutes: MetadataRoute.Sitemap = getAllProgrammaticPages().map((page) => ({
+    url: `${baseUrl}${page.path}`,
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.9,
+  }))
+
   return [
     ...staticRoutes,
     ...blogRoutes,
     ...toolRoutes,
     ...useCaseRoutes,
     ...resourceRoutes,
+    ...programmaticRoutes,
   ]
 }

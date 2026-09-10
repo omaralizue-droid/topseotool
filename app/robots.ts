@@ -7,16 +7,23 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        allow: [
+          "/",
+          "/seo-tools",
+          "/seo-audit",
+          "/keyword-research",
+          "/rank-tracker",
+          "/competitor-analysis",
+          "/backlink-checker",
+          "/content-optimizer",
+          "/serp-analyzer",
+        ],
         disallow: [
           "/dashboard/",
           "/admin/",
           "/billing/",
           "/developers/",
           "/projects/",
-          "/site-audit/",
-          "/keyword-research/",
-          "/competitor-analysis/",
           "/api/",
           "/settings/",
           "/onboarding/",
