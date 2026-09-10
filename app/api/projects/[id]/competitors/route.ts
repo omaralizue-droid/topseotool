@@ -56,7 +56,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     // Check Plan Limit
     const planKey = project.organization.subscription?.plan ?? "FREE"
     const planConfig = getPlanConfig(planKey)
-    const maxCompetitors = planConfig.limits.competitors
+    const maxCompetitors = planConfig.limits.competitorsPerProject ?? planConfig.limits.competitor_domains_limit ?? 3
 
     if (project.competitors.length >= maxCompetitors) {
       throw new ValidationError(`Your ${planConfig.name} plan allows up to ${maxCompetitors} competitors. Please upgrade to add more.`)

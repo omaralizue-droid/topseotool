@@ -5,7 +5,7 @@ import { Check, HelpCircle, ArrowRight, Zap, Shield, Sparkles, CheckCircle2, XCi
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { PLANS, PLAN_ORDER, type PlanKey } from "@/types"
+import { PLANS, PLAN_ORDER, canPlanAccessFeature, type PlanKey } from "@/types"
 
 const FAQS = [
   {
@@ -148,39 +148,47 @@ export default function PricingPage() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {[
-                    { label: "Website Projects", key: "projects" as const, format: (v: number) => (v >= 999 ? "Unlimited" : v.toString()) },
-                    { label: "SEO Audits / month", key: "auditsPerMonth" as const, format: (v: number) => (v >= 999 ? "Unlimited" : v.toString()) },
-                    { label: "AI Engine Queries / month", key: "aiQueriesPerMonth" as const, format: (v: number) => (v >= 9999 ? "Unlimited" : v.toLocaleString()) },
-                    { label: "Competitor Benchmark Slots", key: "competitors" as const, format: (v: number) => (v >= 999 ? "Unlimited" : v.toString()) },
-                    { label: "Team Seats", key: "teamSeats" as const, format: (v: number) => (v >= 999 ? "Unlimited" : v === 0 ? "Owner only" : v.toString()) },
+                    { label: "Website Projects", key: "projects" as const, format: (v?: number) => ((v ?? 0) >= 999 ? "Unlimited" : (v ?? 0).toString()) },
+                    { label: "SEO Audits / month", key: "auditsPerMonth" as const, format: (v?: number) => ((v ?? 0) >= 999 ? "Unlimited" : (v ?? 0).toString()) },
+                    { label: "AI Engine Queries / month", key: "aiQueriesPerMonth" as const, format: (v?: number) => ((v ?? 0) >= 9999 ? "Unlimited" : (v ?? 0).toLocaleString()) },
+                    { label: "Competitor Benchmark Slots", key: "competitorsPerProject" as const, format: (v?: number) => ((v ?? 0) >= 999 ? "Unlimited" : (v ?? 0).toString()) },
+                    { label: "Team Seats", key: "teamSeats" as const, format: (v?: number) => ((v ?? 0) >= 999 ? "Unlimited" : (v ?? 0) === 0 ? "Owner only" : (v ?? 1).toString()) },
                   ].map((row) => (
                     <tr key={row.label}>
                       <td className="py-3 pr-4 font-medium text-foreground">{row.label}</td>
-                      {PLAN_ORDER.map((pk) => (
-                        <td key={pk} className="text-center py-3 px-3 font-mono-nums">
-                          {row.format(PLANS[pk].limits[row.key] as number)}
-                        </td>
-                      ))}
+                      {PLAN_ORDER.map((pk) => {
+                        const val = PLANS[pk]?.limits?.[row.key]
+                        return (
+                          <td key={pk} className="text-center py-3 px-3 font-mono-nums">
+                            {row.format(val)}
+                          </td>
+                        )
+                      })}
                     </tr>
                   ))}
                   {[
-                    { label: "AI Search Visibility Audit Module", key: "aiAudits" as const },
-                    { label: "PDF Report Generation", key: "reports" as const },
-                    { label: "White-label Client Branding", key: "whiteLabel" as const },
-                    { label: "REST API & Webhooks", key: "apiAccess" as const },
-                    { label: "Priority Customer Support", key: "prioritySupport" as const },
+                    { label: "AI Search Visibility Audit Module", feature: "ai_search_visibility" as const },
+                    { label: "PDF Report Generation", feature: "custom_reports" as const, checkReports: true },
+                    { label: "White-label Client Branding", feature: "white_label" as const },
+                    { label: "REST API & Webhooks", feature: "api_access" as const },
+                    { label: "Priority Customer Support", feature: "priority_support" as const },
                   ].map((row) => (
                     <tr key={row.label}>
                       <td className="py-3 pr-4 font-medium text-foreground">{row.label}</td>
-                      {PLAN_ORDER.map((pk) => (
-                        <td key={pk} className="text-center py-3 px-3">
-                          {PLANS[pk].limits[row.key] ? (
-                            <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" />
-                          ) : (
-                            <XCircle className="h-4 w-4 text-muted-foreground/30 mx-auto" />
-                          )}
-                        </td>
-                      ))}
+                      {PLAN_ORDER.map((pk) => {
+                        const hasAccess = row.checkReports
+                          ? (PLANS[pk]?.limits?.reportsPerMonth ?? 0) > 0
+                          : canPlanAccessFeature(pk, row.feature)
+                        return (
+                          <td key={pk} className="text-center py-3 px-3">
+                            {hasAccess ? (
+                              <CheckCircle2 className="h-4 w-4 text-emerald-500 mx-auto" />
+                            ) : (
+                              <XCircle className="h-4 w-4 text-muted-foreground/30 mx-auto" />
+                            )}
+                          </td>
+                        )
+                      })}
                     </tr>
                   ))}
                 </tbody>
