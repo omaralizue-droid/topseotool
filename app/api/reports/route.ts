@@ -5,6 +5,8 @@ import { compileProjectReport } from "@/lib/reports/report-generator"
 import { handleApiError } from "@/lib/errors"
 import { checkEntitlement, recordUsage, METRIC } from "@/lib/billing/entitlements"
 import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth"
+import { jobQueue } from "@/lib/jobs/queue-core"
+import "@/lib/jobs/handlers"
 
 export async function GET(req: NextRequest) {
   const session = BYPASS_AUTH ? MOCK_SESSION : await auth()
@@ -97,32 +99,35 @@ export async function POST(req: NextRequest) {
         title: title || `${config?.clientName || project.name} Executive Report`,
         type: "EXECUTIVE_SUMMARY",
         format: "PDF",
-        status: "READY",
+        status: "GENERATING",
         fileUrl: `/reports/share/preview`,
         config: config ? JSON.parse(JSON.stringify(config)) : undefined,
       }
     })
 
-    const compiledData = compileProjectReport(
-      report.title,
-      config?.agencyName || project.organization.name,
-      domain,
-      seoScore,
-      aiScore,
+    // Enqueue asynchronous background job for report generation
+    const job = await jobQueue.enqueue(
+      "REPORT_GENERATION",
       {
-        branding: config,
-        period: config?.reportPeriod,
-      }
+        reportId: report.id,
+        title: report.title,
+        agencyName: config?.agencyName || project.organization.name,
+        clientWebsite: domain,
+        seoScore,
+        aiScore,
+        config,
+      },
+      { organizationId: project.organizationId, userId: session.user.id }
     )
-    compiledData.id = report.id
-    compiledData.shareToken = report.id
 
-    await db.report.update({
-      where: { id: report.id },
-      data: { fileUrl: `/reports/share/${report.id}` }
-    })
-
-    return NextResponse.json({ ok: true, data: { report, compiledData } }, { status: 201 })
+    return NextResponse.json(
+      {
+        ok: true,
+        message: "Executive PDF report compilation enqueued in background",
+        data: { report, jobId: job.id, status: "QUEUED" }
+      },
+      { status: 202 }
+    )
   } catch (err) {
     return handleApiError(err, "REPORTS_POST")
   }

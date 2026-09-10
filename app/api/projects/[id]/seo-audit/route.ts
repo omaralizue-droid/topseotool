@@ -6,6 +6,8 @@ import { runSEOAuditEngine } from "@/lib/crawler/audit-engine"
 import { checkAndRecord, METRIC } from "@/lib/billing/entitlements"
 import { handleApiError } from "@/lib/errors"
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit"
+import { jobQueue } from "@/lib/jobs/queue-core"
+import "@/lib/jobs/handlers"
 
 interface RouteParams { params: Promise<{ id: string }> }
 
@@ -50,10 +52,21 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       data: { projectId, targetUrl: url, status: "PENDING" }
     })
 
-    // Execute audit engine (non-blocking)
-    void runSEOAuditEngine(audit.id, url)
+    // Enqueue non-blocking asynchronous website crawl job
+    const job = await jobQueue.enqueue(
+      "WEBSITE_CRAWL",
+      { auditId: audit.id, targetUrl: url },
+      { organizationId: project.organizationId, userId: session.user.id }
+    )
 
-    return NextResponse.json({ ok: true, data: { id: audit.id, status: "RUNNING" } }, { status: 202 })
+    return NextResponse.json(
+      {
+        ok: true,
+        message: "SEO audit and website crawl enqueued in background",
+        data: { id: audit.id, jobId: job.id, status: "QUEUED" }
+      },
+      { status: 202 }
+    )
   } catch (err) {
     return handleApiError(err, "SEO_AUDIT_POST")
   }

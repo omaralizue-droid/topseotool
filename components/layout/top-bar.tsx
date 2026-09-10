@@ -26,6 +26,8 @@ import { getInitials } from "@/lib/utils"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
 import { useEntitlements } from "@/hooks/use-entitlements"
+import { JobStatusDrawer } from "@/components/jobs/job-status-drawer"
+import { Activity } from "lucide-react"
 
 interface TopBarProps {
   user: {
@@ -110,6 +112,7 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
   )
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [jobsDrawerOpen, setJobsDrawerOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
   const unreadCount = notifications.filter(n => n.unread).length
@@ -244,6 +247,18 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
 
       {/* Right Actions */}
       <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
+
+        {/* 2.5. Background Jobs Drawer Trigger */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setJobsDrawerOpen(true)}
+          className="h-8 px-2.5 text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5 rounded-lg border border-border/50 hover:border-border transition-colors shadow-xs"
+          title="View Background Job Queue"
+        >
+          <Activity className="h-3.5 w-3.5 text-brand" />
+          <span className="hidden sm:inline font-medium">Jobs</span>
+        </Button>
 
         {/* 3. Notifications Feed */}
         <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
@@ -446,6 +461,9 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Background Job Queue Status Drawer */}
+      <JobStatusDrawer open={jobsDrawerOpen} onOpenChange={setJobsDrawerOpen} />
     </header>
   )
 }

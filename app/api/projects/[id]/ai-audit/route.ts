@@ -6,6 +6,8 @@ import { runAIVisibilityScanEngine } from "@/lib/ai-visibility/scan-engine"
 import { checkAndRecord, METRIC } from "@/lib/billing/entitlements"
 import { handleApiError } from "@/lib/errors"
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit"
+import { jobQueue } from "@/lib/jobs/queue-core"
+import "@/lib/jobs/handlers"
 
 interface RouteParams { params: Promise<{ id: string }> }
 
@@ -56,10 +58,21 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       }
     })
 
-    // Execute non-blocking background scan
-    void runAIVisibilityScanEngine(scan.id, projectId)
+    // Enqueue non-blocking asynchronous AI visibility scan job
+    const job = await jobQueue.enqueue(
+      "AI_PROCESSING",
+      { scanId: scan.id, projectId, engines },
+      { organizationId: project.organizationId, userId: session.user.id }
+    )
 
-    return NextResponse.json({ ok: true, data: { id: scan.id, status: "RUNNING" } }, { status: 202 })
+    return NextResponse.json(
+      {
+        ok: true,
+        message: "AI visibility scan enqueued in background",
+        data: { id: scan.id, jobId: job.id, status: "QUEUED" }
+      },
+      { status: 202 }
+    )
   } catch (err) {
     return handleApiError(err, "AI_AUDIT_POST")
   }
