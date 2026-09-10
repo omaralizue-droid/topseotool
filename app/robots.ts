@@ -10,7 +10,13 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: [
           "/dashboard/",
+          "/admin/",
+          "/billing/",
+          "/developers/",
           "/projects/",
+          "/site-audit/",
+          "/keyword-research/",
+          "/competitor-analysis/",
           "/api/",
           "/settings/",
           "/onboarding/",
