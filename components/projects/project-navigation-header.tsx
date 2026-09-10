@@ -76,7 +76,7 @@ export function ProjectNavigationHeader({
       {/* Upper bar: Project Identity & Target Badges */}
       <div className="px-4 sm:px-6 md:px-8 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-md bg-muted text-foreground flex items-center justify-center font-bold text-xs shrink-0 border border-border/80">
             {domain[0]?.toUpperCase() ?? "P"}
           </div>
 
@@ -145,7 +145,7 @@ export function ProjectNavigationHeader({
             className="h-7 text-[11px] font-medium"
           >
             <Link href={`/projects/${projectId}/reports`}>
-              <Sparkles className="h-3 w-3 mr-1" /> Export Report
+              <FileText className="h-3 w-3 mr-1" /> Export Report
             </Link>
           </Button>
         </div>

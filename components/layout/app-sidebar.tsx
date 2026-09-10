@@ -171,14 +171,19 @@ export function AppSidebar({
       >
         {/* Brand Header */}
         <div className="flex items-center h-14 px-3 border-b border-sidebar-border shrink-0 gap-2">
-          <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-brand-gradient text-white font-bold text-sm shrink-0 select-none shadow-brand">
-              <Sparkles className="h-4 w-4" />
+          <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0 group">
+            <div className="flex items-center justify-center w-8 h-8 rounded-md bg-foreground text-background font-bold text-xs shrink-0 select-none transition-transform group-hover:scale-[1.02]">
+              <Layers className="h-4 w-4" />
             </div>
             {(!collapsed || isMobileDrawer) && (
-              <span className="font-extrabold text-sm tracking-tight truncate text-brand-gradient">
-                TOPSEOTOOL
-              </span>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-bold text-sm tracking-tight truncate text-foreground">
+                  TopSEOTool
+                </span>
+                <span className="text-[9px] font-mono font-semibold px-1.5 py-0.2 rounded bg-muted text-muted-foreground border border-border/60">
+                  SaaS
+                </span>
+              </div>
             )}
           </Link>
           {isMobileDrawer ? (
@@ -318,21 +323,21 @@ function NavItem({ label, href, icon: Icon, active, collapsed, badge }: NavItemP
     <Link
       href={href}
       className={cn(
-        "relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-all duration-150",
+        "relative flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs transition-colors duration-100",
         active
-          ? "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-brand"
-          : "text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent font-medium"
+          ? "bg-accent/80 text-foreground font-semibold"
+          : "text-muted-foreground hover:text-foreground hover:bg-accent/40 font-medium"
       )}
     >
       {active && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white/70 rounded-r-full" />
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[2.5px] h-4 bg-primary rounded-r-full" />
       )}
-      <Icon className={cn("h-4 w-4 shrink-0", active ? "opacity-100" : "opacity-75")} />
+      <Icon className={cn("h-4 w-4 shrink-0", active ? "text-primary opacity-100" : "opacity-70")} />
       {!collapsed && (
         <span className="truncate flex-1">{label}</span>
       )}
       {!collapsed && badge && (
-        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand/20 text-brand dark:bg-white/20 dark:text-white/90 tracking-wide shrink-0">
+        <span className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/50 shrink-0">
           {badge}
         </span>
       )}

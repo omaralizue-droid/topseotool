@@ -17,6 +17,7 @@ import { AIRecommendations } from "@/components/dashboard/ai-recommendations"
 import { ProjectSelector } from "@/components/dashboard/project-selector"
 import { EmptyState } from "@/components/ui/empty-state"
 import { UsageMetricsCard } from "@/components/dashboard/usage-metrics-card"
+import { DashboardCockpit } from "@/components/dashboard/dashboard-cockpit"
 
 export const metadata: Metadata = { title: "Dashboard Overview | TOPSEOTOOL" }
 
@@ -157,92 +158,24 @@ export default async function DashboardPage() {
   }))
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-5 sm:space-y-6 animate-fade-in">
-      {/* Hero Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pb-2 border-b border-border/40">
-        <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight mb-1">
-            {greeting}, {firstName}
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Here&apos;s how your search &amp; AI visibility is performing.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 sm:gap-3">
-          <ProjectSelector projects={formattedProjects} selectedProjectId={primaryProject.id} />
-          <Button size="sm" variant="brand" asChild>
-            <Link href={`/projects/${primaryProject.id}/seo-audit`}>
-              <Globe className="h-4 w-4 mr-1.5" /> Run Audit
-            </Link>
-          </Button>
-        </div>
-      </div>
-
-      {/* 4 Primary Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
-          title="SEO Health"
-          score={seoScore}
-          previousScore={prevSeoScore}
-          changePercent={seoChange}
-          icon={Globe}
-          color="text-emerald-600 dark:text-emerald-400"
-        />
-        <MetricCard
-          title="AI Visibility"
-          score={aiScore}
-          previousScore={prevAiScore}
-          changePercent={aiChange}
-          icon={Brain}
-          color="text-violet-600 dark:text-violet-400"
-        />
-        <MetricCard
-          title="AI Mention Rate"
-          score={mentionsRate}
-          previousScore={80}
-          changePercent={5}
-          icon={TrendingUp}
-          color="text-amber-600 dark:text-amber-400"
-        />
-        <MetricCard
-          title="Citation Share"
-          score={citationShare}
-          previousScore={70}
-          changePercent={8}
-          icon={Link2}
-          color="text-sky-600 dark:text-sky-400"
-        />
-      </div>
-
-      {/* 9 Core Platform Usage & Quota Meters */}
-      <UsageMetricsCard />
-
-      {/* Grid Row 1: AI Visibility Chart & Competitor Benchmark */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-        <div className="md:col-span-2">
-          <AIVisibilityChart />
-        </div>
-        <div>
-          <CompetitorComparison
-            myBrandScore={seoScore}
-            myBrandVisibility={aiScore}
-            competitors={formattedCompetitors}
-          />
-        </div>
-      </div>
-
-      {/* Grid Row 2: Top Mentions & Recent Citations */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        <TopMentions mentions={formattedMentions} />
-        <RecentCitations citations={formattedCitations} />
-      </div>
-
-      {/* Grid Row 3: Critical Issues & Recommendations */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        <CriticalIssues issues={criticalIssues} projectId={primaryProject.id} />
-        <AIRecommendations recommendations={formattedRecs} />
-      </div>
+    <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-5 animate-fade-in">
+      <DashboardCockpit
+        primaryProject={primaryProject}
+        formattedProjects={formattedProjects}
+        formattedCompetitors={formattedCompetitors}
+        formattedMentions={formattedMentions}
+        formattedCitations={formattedCitations}
+        criticalIssues={criticalIssues}
+        formattedRecs={formattedRecs}
+        seoScore={seoScore}
+        prevSeoScore={prevSeoScore}
+        seoChange={seoChange}
+        aiScore={aiScore}
+        prevAiScore={prevAiScore}
+        aiChange={aiChange}
+        mentionsRate={mentionsRate}
+        citationShare={citationShare}
+      />
     </div>
   )
 }
