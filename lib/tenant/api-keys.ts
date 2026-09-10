@@ -3,9 +3,11 @@
 // Complete Developer API Architecture with Key Rotation, Scopes, Logging & Webhooks
 // ============================================================
 
+import crypto from "crypto"
 import { db } from "@/lib/db"
 import { logger } from "@/lib/logger"
 import { cache } from "@/lib/cache/cache-service"
+import { logSecurityAudit } from "@/lib/security/audit-logger"
 
 export type ApiScope =
   | "*"
@@ -128,15 +130,12 @@ let inMemoryWebhooks: WebhookEndpoint[] = [
   },
 ]
 
+/**
+ * Cryptographically secure SHA-256 hash for API key storage and lookup.
+ * Raw API keys are NEVER stored in plaintext.
+ */
 function hashKey(rawKey: string): string {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(rawKey)
-  let hash = 0
-  for (let i = 0; i < data.length; i++) {
-    hash = (hash << 5) - hash + data[i]
-    hash |= 0
-  }
-  return `hash_${Math.abs(hash)}_${rawKey.slice(0, 8)}`
+  return crypto.createHash("sha256").update(rawKey).digest("hex")
 }
 
 /**
@@ -149,14 +148,15 @@ export async function generateEnterpriseApiKey(
   rateLimitPerMin = 120,
   userId?: string
 ): Promise<{ id: string; rawKey: string; keyPrefix: string; keyHash: string; scopes: string[] }> {
-  const randomBytes = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+  // CSPRNG: Generate 24 random bytes (48 hex chars)
+  const randomBytes = crypto.randomBytes(24).toString("hex")
   const rawKey = `topseo_live_${randomBytes}`
   const keyPrefix = rawKey.slice(0, 16)
   const keyHash = hashKey(rawKey)
 
   let id = `key_${Date.now()}`
   try {
-    const created = await db.apiKey.create({
+    const created = await (db as any).apiKey.create({
       data: {
         organizationId,
         userId,
@@ -172,6 +172,15 @@ export async function generateEnterpriseApiKey(
     // Graceful fallback for mock / offline mode
   }
 
+  void logSecurityAudit({
+    eventType: "api_key.created",
+    actorId: userId,
+    organizationId,
+    targetResource: "ApiKey",
+    targetResourceId: id,
+    metadata: { keyPrefix, name, scopes, rateLimitPerMin },
+  })
+
   logger.info("Enterprise API Key created", "API_KEYS", { organizationId, name, scopes })
   return { id, rawKey, keyPrefix, keyHash, scopes }
 }
@@ -183,13 +192,13 @@ export async function rotateEnterpriseApiKey(
   apiKeyId: string,
   organizationId: string
 ): Promise<{ rawKey: string; keyPrefix: string; keyHash: string }> {
-  const randomBytes = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+  const randomBytes = crypto.randomBytes(24).toString("hex")
   const rawKey = `topseo_live_${randomBytes}`
   const keyPrefix = rawKey.slice(0, 16)
   const keyHash = hashKey(rawKey)
 
   try {
-    await db.apiKey.updateMany({
+    await (db as any).apiKey.updateMany({
       where: { id: apiKeyId, organizationId },
       data: {
         keyPrefix,
@@ -200,6 +209,14 @@ export async function rotateEnterpriseApiKey(
   } catch {
     // Non-blocking fallback
   }
+
+  void logSecurityAudit({
+    eventType: "api_key.rotated",
+    organizationId,
+    targetResource: "ApiKey",
+    targetResourceId: apiKeyId,
+    metadata: { newPrefix: keyPrefix },
+  })
 
   logger.info("API Key rotated", "API_KEYS", { apiKeyId, organizationId, keyPrefix })
   return { rawKey, keyPrefix, keyHash }
@@ -233,7 +250,7 @@ export async function verifyEnterpriseApiKey(
 
   let apiKeyRecord = null
   try {
-    apiKeyRecord = await db.apiKey.findUnique({
+    apiKeyRecord = await (db as any).apiKey.findUnique({
       where: { keyHash },
       include: {
         organization: {
@@ -260,7 +277,7 @@ export async function verifyEnterpriseApiKey(
   if (requiredScope && requiredScope !== "*") {
     const hasWildcard = keyScopes.includes("*") || keyScopes.includes("full_access")
     const hasExact = keyScopes.includes(requiredScope)
-    const hasCategoryWildcard = keyScopes.some((s) => s === `${requiredScope.split(":")[0]}:*`)
+    const hasCategoryWildcard = keyScopes.some((s: string) => s === `${requiredScope.split(":")[0]}:*`)
 
     if (!hasWildcard && !hasExact && !hasCategoryWildcard) {
       return {
@@ -288,7 +305,7 @@ export async function verifyEnterpriseApiKey(
   }
 
   // Async telemetry update
-  db.apiKey.update({
+  ;(db as any).apiKey.update({
     where: { id: apiKeyRecord.id },
     data: {
       totalRequests: { increment: 1 },

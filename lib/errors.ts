@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
+import { sanitizeForClient } from "@/lib/security/response-sanitizer";
 
 export class AppError extends Error {
   public readonly statusCode: number;
@@ -55,7 +56,7 @@ export function handleApiError(error: unknown, context = "API") {
         ok: false,
         error: error.message,
         code: error.code,
-        ...(error instanceof ValidationError ? { details: error.details } : {}),
+        ...(error instanceof ValidationError ? { details: sanitizeForClient(error.details) } : {}),
       },
       { status: error.statusCode }
     );

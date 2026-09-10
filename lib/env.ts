@@ -6,6 +6,7 @@ const envSchema = z.object({
   AUTH_URL: z.string().optional(),
   AUTH_GOOGLE_ID: z.string().optional(),
   AUTH_GOOGLE_SECRET: z.string().optional(),
+  ENCRYPTION_KEY: z.string().optional(),
   GEMINI_API_KEY: z.string().optional(),
   STRIPE_SECRET_KEY: z.string().optional(),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
@@ -21,6 +22,45 @@ const envSchema = z.object({
 })
 
 export const env = envSchema.parse(process.env)
+
+/**
+ * Enterprise Audit Check: Guarantees that server-only secrets are NEVER
+ * exposed with the NEXT_PUBLIC_ prefix in the environment.
+ */
+export function assertNoLeakedSecrets(): { safe: boolean; violations: string[] } {
+  const violations: string[] = []
+  const sensitiveNames = [
+    "DATABASE",
+    "SECRET",
+    "PRIVATE_KEY",
+    "GEMINI_KEY",
+    "RESEND_KEY",
+    "ENCRYPTION",
+  ]
+
+  for (const [key] of Object.entries(process.env)) {
+    if (key.startsWith("NEXT_PUBLIC_")) {
+      const remainder = key.replace("NEXT_PUBLIC_", "").toUpperCase()
+      // Publishable Stripe key is the only explicitly permitted public key
+      if (key === "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY") continue
+
+      if (sensitiveNames.some((s) => remainder.includes(s))) {
+        violations.push(key)
+      }
+    }
+  }
+
+  if (violations.length > 0) {
+    console.error(
+      `[CRITICAL SECURITY ALERT] The following secrets appear to be exposed via NEXT_PUBLIC_ prefixes: ${violations.join(", ")}`
+    )
+  }
+
+  return {
+    safe: violations.length === 0,
+    violations,
+  }
+}
 
 /**
  * Validate production environment variables without logging secret values.

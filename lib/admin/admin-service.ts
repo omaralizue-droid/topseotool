@@ -1,5 +1,6 @@
 import { db } from "@/lib/db"
 import { queueManager, JobRecord } from "@/lib/jobs/queue-service"
+import { getRecentSecurityAudits } from "@/lib/security/audit-logger"
 
 // ===========================================================================
 // INTERFACES & TYPES
@@ -976,7 +977,17 @@ export const AdminService = {
    * 10. Audit Logs Capability
    */
   async getAuditLogs(): Promise<AdminAuditLog[]> {
-    return [...IN_MEMORY_AUDIT_LOGS]
+    const liveAudits: AdminAuditLog[] = getRecentSecurityAudits(50).map((r) => ({
+      id: r.id,
+      actorEmail: r.actorEmail || "security-guard@topseotool.net",
+      actorRole: (r.actorRole === "SUPER_ADMIN" ? "SUPER_ADMIN" : "SYSTEM") as "SUPER_ADMIN" | "SYSTEM" | "API",
+      action: r.eventType,
+      targetResource: r.targetResource || "Platform Defense",
+      ipAddress: r.clientIp || "127.0.0.1",
+      userAgent: r.userAgent || "Automated Guard",
+      timestamp: new Date(r.timestamp).toLocaleTimeString(),
+    }))
+    return [...liveAudits, ...IN_MEMORY_AUDIT_LOGS]
   },
 
   logAuditAction(actorEmail: string, action: string, targetResource: string) {

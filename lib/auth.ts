@@ -13,11 +13,29 @@ const loginSchema = z.object({
 
 import { BYPASS_AUTH, MOCK_SESSION } from "@/lib/mock-auth";
 
+import { logSecurityAudit } from "@/lib/security/audit-logger";
+
+const isProduction = process.env.NODE_ENV === "production";
+
 const nextAuthInstance = NextAuth({
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "default_auth_secret_for_topseotool_dev_32chars_long",
   trustHost: true,
   ...(process.env.DATABASE_URL ? { adapter: PrismaAdapter(db) } : {}),
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: isProduction ? "__Secure-authjs.session-token" : "authjs.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProduction,
+      },
+    },
+  },
   pages: {
     signIn: "/login",
     error: "/login",
@@ -35,15 +53,47 @@ const nextAuthInstance = NextAuth({
       },
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        if (!parsed.success) {
+          void logSecurityAudit({
+            eventType: "auth.login.failed",
+            status: "DENIED",
+            metadata: { reason: "validation_failed" },
+          });
+          return null;
+        }
 
         const { email, password } = parsed.data;
 
         const user = await db.user.findUnique({ where: { email } });
-        if (!user || !user.password) return null;
+        if (!user || !user.password) {
+          void logSecurityAudit({
+            eventType: "auth.login.failed",
+            actorEmail: email,
+            status: "DENIED",
+            metadata: { reason: "user_not_found_or_no_password" },
+          });
+          return null;
+        }
 
         const valid = await comparePassword(password, user.password);
-        if (!valid) return null;
+        if (!valid) {
+          void logSecurityAudit({
+            eventType: "auth.login.failed",
+            actorId: user.id,
+            actorEmail: email,
+            status: "DENIED",
+            metadata: { reason: "invalid_password" },
+          });
+          return null;
+        }
+
+        void logSecurityAudit({
+          eventType: "auth.login.success",
+          actorId: user.id,
+          actorEmail: user.email,
+          actorRole: user.role,
+          status: "SUCCESS",
+        });
 
         return {
           id: user.id,
