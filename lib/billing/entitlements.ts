@@ -571,6 +571,8 @@ export type EntitlementAction =
   | "RUN_SEO_AUDIT"
   | "ADD_TRACKED_KEYWORD"
   | "RUN_AI_SCAN"
+  | "KEYWORD_RESEARCH"
+  | "RANK_TRACKING"
 
 export async function checkEntitlement(
   organizationId: string,
@@ -590,6 +592,7 @@ export async function checkEntitlement(
       break
 
     case "KEYWORD_SEARCH":
+    case "KEYWORD_RESEARCH":
       if (usage.metrics.keywordSearches.used + quantity > usage.metrics.keywordSearches.limit) {
         throw new ValidationError(
           `Monthly keyword search limit reached (${usage.metrics.keywordSearches.used}/${usage.metrics.keywordSearches.limit}). ${UPGRADE_CTA}`
@@ -616,6 +619,7 @@ export async function checkEntitlement(
 
     case "TRACK_KEYWORD":
     case "ADD_TRACKED_KEYWORD":
+    case "RANK_TRACKING":
       if (usage.metrics.rankKeywords.used + quantity > usage.metrics.rankKeywords.limit) {
         throw new ValidationError(
           `Rank tracking keyword limit reached (${usage.metrics.rankKeywords.used}/${usage.metrics.rankKeywords.limit}). ${UPGRADE_CTA}`
@@ -694,4 +698,19 @@ export async function recordUsage(
   } catch {
     // Silent fail in mock/demo mode
   }
+}
+
+// ---------------------------------------------------------------------------
+// 5. Combined Check & Record helper
+// ---------------------------------------------------------------------------
+export async function checkAndRecord(
+  organizationId: string,
+  action: EntitlementAction | string,
+  metric: MetricKey,
+  quantity = 1,
+  userId?: string,
+  metadata?: Record<string, unknown>
+): Promise<void> {
+  await checkEntitlement(organizationId, action as EntitlementAction, quantity)
+  await recordUsage(organizationId, metric, quantity, userId, metadata)
 }
