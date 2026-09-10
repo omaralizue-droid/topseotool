@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/layout/theme-toggle"
 import { cn } from "@/lib/utils"
 
 const NAV_LINKS = [
+  { label: "Platform", href: "/seo-tools" },
   { label: "Features", href: "/#features" },
   { label: "Free Tools", href: "/tools" },
   { label: "Use Cases", href: "/use-cases" },
@@ -21,8 +22,8 @@ export function MarketingNav() {
     <header className="sticky top-0 z-50 glass border-b border-border">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4 sm:gap-6">
         <Link href="/" className="flex items-center gap-2.5 font-bold text-sm shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-brand text-brand-foreground flex items-center justify-center font-bold text-sm shadow-brand">T</div>
-          <span className="tracking-tight">TOPSEOTOOL</span>
+          <div className="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center font-bold text-sm font-mono shadow-sm">T</div>
+          <span className="tracking-tight text-foreground">TopSEOTool</span>
         </Link>
 
         {/* Desktop nav */}
