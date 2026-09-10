@@ -13,6 +13,9 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useEntitlements } from "@/hooks/use-entitlements"
+import { UpgradePromptModal } from "@/components/billing/upgrade-prompt-modal"
+import { toast } from "sonner"
 
 interface TrackedKeyword {
   id: string
@@ -44,8 +47,12 @@ export default function RankTrackerPage() {
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop")
   const [searchFilter, setSearchFilter] = useState("")
   const [addModalOpen, setAddModalOpen] = useState(false)
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false)
   const [newKeywordInput, setNewKeywordInput] = useState("")
   const [newTagInput, setNewTagInput] = useState("Organic")
+
+  const { limits, planKey } = useEntitlements()
+  const maxKeywords = limits?.monthly_rank_tracking_limit ?? limits?.trackedKeywords ?? 10
 
   const filtered = keywords.filter((k) =>
     k.keyword.toLowerCase().includes(searchFilter.toLowerCase()) ||
@@ -61,6 +68,13 @@ export default function RankTrackerPage() {
     if (!newKeywordInput.trim()) return
 
     const lines = newKeywordInput.split("\n").map(l => l.trim()).filter(Boolean)
+
+    if (keywords.length + lines.length > maxKeywords) {
+      toast.error(`Rank tracking quota reached (${keywords.length}/${maxKeywords}). Upgrade to track more keywords.`)
+      setUpgradeModalOpen(true)
+      return
+    }
+
     const newItems: TrackedKeyword[] = lines.map((line, idx) => ({
       id: `custom_${Date.now()}_${idx}`,
       keyword: line,
@@ -77,6 +91,7 @@ export default function RankTrackerPage() {
     setKeywords(prev => [...newItems, ...prev])
     setNewKeywordInput("")
     setAddModalOpen(false)
+    toast.success(`Added ${newItems.length} keyword(s) to daily rank tracking radar`)
   }
 
   const exportCSV = () => {
@@ -321,6 +336,15 @@ export default function RankTrackerPage() {
           </table>
         </div>
       </Card>
+
+      <UpgradePromptModal
+        open={upgradeModalOpen}
+        onOpenChange={setUpgradeModalOpen}
+        metricName="Rank Keywords Tracked"
+        currentUsage={keywords.length}
+        currentLimit={maxKeywords}
+        currentPlanKey={planKey}
+      />
     </div>
   )
 }

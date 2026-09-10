@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { FeatureGate } from "@/components/billing/feature-gate"
 
 interface RecommendedTerm {
   term: string
@@ -152,8 +153,9 @@ export default function ContentOptimizerPage() {
         </div>
       </div>
 
-      {/* Target Keyword Input Bar */}
-      <Card className="p-3 border-border/80 shadow-xs bg-card">
+      <FeatureGate feature="content_optimizer" blurPreview>
+        {/* Target Keyword Input Bar */}
+        <Card className="p-3 border-border/80 shadow-xs bg-card">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground shrink-0 pl-1">
             <Target className="h-4 w-4 text-brand" /> Target Primary Keyword:
@@ -281,6 +283,7 @@ export default function ContentOptimizerPage() {
           </Card>
         </div>
       </div>
+      </FeatureGate>
     </div>
   )
 }

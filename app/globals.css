@@ -366,9 +366,74 @@
 .trend-down { color: #ef4444; }
 .trend-flat { color: hsl(var(--muted-foreground)); }
 
-/* ─── Print styles ─────────────────────────────────────────────────────────── */
+/* ─── Print styles & High-Fidelity PDF Export ───────────────────────────────── */
+@page {
+  size: A4 portrait;
+  margin: 12mm 14mm 12mm 14mm;
+}
+
 @media print {
-  .print\:hidden { display: none !important; }
-  body { background: white; color: black; }
-  .bg-sidebar { background: white; }
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  aside, nav, header, footer:not(.report-container footer), [role="dialog"], .sonner-toast {
+    display: none !important;
+  }
+
+  .report-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .report-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .report-page-break {
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+
+  /* Force exact color reproduction */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Clean print borders */
+  .border, .border-border, .border-border\/60, .border-border\/80 {
+    border-color: #e2e8f0 !important;
+  }
+
+  /* Ensure SVGs and charts scale crisply */
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Optimize table spacing for print page width */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
 }

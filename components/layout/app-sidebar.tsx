@@ -1,28 +1,35 @@
 "use client"
+
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   FolderKanban,
+  ShieldCheck,
   Search,
   TrendingUp,
-  Link2,
-  Globe,
-  FileEdit,
   Users2,
-  Brain,
-  Zap,
-  Lightbulb,
+  Link2,
+  FileEdit,
+  PenTool,
+  Layers,
+  BarChart3,
+  Gauge,
   FileText,
+  Bell,
+  Plug,
+  KeyRound,
+  Users,
   CreditCard,
   Settings,
-  Plus,
+  Palette,
   PanelLeftClose,
   PanelLeft,
   X,
   Sparkles,
-  Layers,
-  ShieldCheck,
+  Plus,
+  Terminal,
+  ShieldAlert
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -37,42 +44,120 @@ interface AppSidebarProps {
   onMobileClose?: () => void
 }
 
-export function AppSidebar({ collapsed, onToggle, activeProjectId, isMobileDrawer, onMobileClose }: AppSidebarProps) {
+export function AppSidebar({
+  collapsed,
+  onToggle,
+  activeProjectId,
+  isMobileDrawer,
+  onMobileClose,
+}: AppSidebarProps) {
   const pathname = usePathname()
 
   const projectPrefix = activeProjectId ? `/projects/${activeProjectId}` : null
+  const defaultProjectPrefix = "/projects/demo"
 
-  const mainNav = [
-    { label: "Executive Cockpit", href: projectPrefix || "/dashboard", icon: LayoutDashboard },
-    { label: "Projects Hub", href: "/projects", icon: FolderKanban },
+  // 1. Dashboard, 2. Projects
+  const coreNav = [
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Projects", href: "/projects", icon: FolderKanban },
   ]
 
-  const organicTools = [
-    { label: "Keyword Explorer", href: projectPrefix ? `${projectPrefix}/keywords` : "/projects", icon: Search, badge: "New" },
-    { label: "Rank Tracker", href: projectPrefix ? `${projectPrefix}/rank-tracker` : "/projects", icon: TrendingUp, badge: null },
-    { label: "Backlink Intelligence", href: projectPrefix ? `${projectPrefix}/backlinks` : "/projects", icon: Link2, badge: "New" },
+  // 3. Site Audit, 4. Keyword Research, 5. Keyword Rank Tracker, 6. Competitor Analysis,
+  // 7. Backlink Explorer, 8. Content Optimizer, 9. SEO Writing Assistant, 10. SERP Analyzer
+  const seoSuite = [
+    {
+      label: "Site Audit",
+      href: projectPrefix ? `${projectPrefix}/seo-audit` : `${defaultProjectPrefix}/seo-audit`,
+      icon: ShieldCheck,
+      badge: "CrUX"
+    },
+    {
+      label: "Keyword Research",
+      href: projectPrefix ? `${projectPrefix}/keywords` : `${defaultProjectPrefix}/keywords`,
+      icon: Search,
+      badge: null
+    },
+    {
+      label: "Keyword Rank Tracker",
+      href: projectPrefix ? `${projectPrefix}/rank-tracker` : `${defaultProjectPrefix}/rank-tracker`,
+      icon: TrendingUp,
+      badge: null
+    },
+    {
+      label: "Competitor Analysis",
+      href: projectPrefix ? `${projectPrefix}/competitors` : `${defaultProjectPrefix}/competitors`,
+      icon: Users2,
+      badge: null
+    },
+    {
+      label: "Backlink Explorer",
+      href: projectPrefix ? `${projectPrefix}/backlinks` : `${defaultProjectPrefix}/backlinks`,
+      icon: Link2,
+      badge: "DR"
+    },
+    {
+      label: "Content Optimizer",
+      href: projectPrefix ? `${projectPrefix}/content-optimizer` : `${defaultProjectPrefix}/content-optimizer`,
+      icon: FileEdit,
+      badge: "AI"
+    },
+    {
+      label: "SEO Writing Assistant",
+      href: projectPrefix ? `${projectPrefix}/writing-assistant` : `${defaultProjectPrefix}/writing-assistant`,
+      icon: PenTool,
+      badge: "NLP"
+    },
+    {
+      label: "SERP Analyzer",
+      href: projectPrefix ? `${projectPrefix}/serp-analyzer` : `${defaultProjectPrefix}/serp-analyzer`,
+      icon: Layers,
+      badge: null
+    },
   ]
 
-  const technicalTools = [
-    { label: "Technical Audit", href: projectPrefix ? `${projectPrefix}/seo-audit` : "/projects", icon: Globe, badge: null },
-    { label: "Content Optimizer", href: projectPrefix ? `${projectPrefix}/content-optimizer` : "/projects", icon: FileEdit, badge: "AI" },
-    { label: "Competitors", href: projectPrefix ? `${projectPrefix}/competitors` : "/projects", icon: Users2, badge: null },
+  // 11. Traffic Insights, 12. Site Performance, 13. Reports, 14. Alerts
+  const performanceSuite = [
+    {
+      label: "Traffic Insights",
+      href: projectPrefix ? `${projectPrefix}/traffic-insights` : `${defaultProjectPrefix}/traffic-insights`,
+      icon: BarChart3,
+      badge: null
+    },
+    {
+      label: "Site Performance",
+      href: projectPrefix ? `${projectPrefix}/site-performance` : `${defaultProjectPrefix}/site-performance`,
+      icon: Gauge,
+      badge: null
+    },
+    {
+      label: "Reports",
+      href: projectPrefix ? `${projectPrefix}/reports` : "/reports",
+      icon: FileText,
+      badge: null
+    },
+    {
+      label: "Alerts",
+      href: "/alerts",
+      icon: Bell,
+      badge: "Live"
+    },
   ]
 
-  const aeoTools = [
-    { label: "AI Search Visibility", href: projectPrefix ? `${projectPrefix}/ai-audit` : "/projects", icon: Brain, badge: "AEO" },
-    { label: "Brand Perception", href: projectPrefix ? `${projectPrefix}/ai-perception` : "/projects", icon: Zap, badge: "Live" },
-    { label: "Actionable Fixes", href: projectPrefix ? `${projectPrefix}/recommendations` : "/projects", icon: Lightbulb, badge: null },
-    { label: "Client Reports", href: projectPrefix ? `${projectPrefix}/reports` : "/reports", icon: FileText, badge: null },
-  ]
-
-  const bottomNav = [
-    { label: "Billing & Plans", href: "/billing", icon: CreditCard },
-    { label: "Settings", href: "/settings", icon: Settings },
+  // 15. Integrations, 16. API, 17. Team, 18. Billing, 19. Settings
+  const settingsSuite = [
+    { label: "Super Admin", href: "/admin", icon: ShieldAlert, badge: "Admin" },
+    { label: "White-Label", href: "/settings/branding", icon: Palette, badge: "Agency" },
+    { label: "Integrations", href: "/settings/integrations", icon: Plug, badge: null },
+    { label: "Developer API", href: "/developers", icon: Terminal, badge: "v1" },
+    { label: "API Settings", href: "/settings/api", icon: KeyRound, badge: null },
+    { label: "Team", href: "/settings/team", icon: Users, badge: "RBAC" },
+    { label: "Billing", href: "/billing", icon: CreditCard, badge: null },
+    { label: "Settings", href: "/settings", icon: Settings, badge: null },
   ]
 
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard"
+    if (href === "/projects") return pathname === "/projects"
     return pathname === href || pathname.startsWith(href + "/")
   }
 
@@ -81,10 +166,10 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId, isMobileDrawe
       <aside
         className={cn(
           "flex flex-col h-full bg-sidebar border-r border-sidebar-border transition-all duration-200 ease-in-out",
-          isMobileDrawer ? "w-[260px] h-screen" : (collapsed ? "w-[60px]" : "w-[240px]")
+          isMobileDrawer ? "w-[260px] h-screen" : (collapsed ? "w-[60px]" : "w-[250px]")
         )}
       >
-        {/* Logo */}
+        {/* Brand Header */}
         <div className="flex items-center h-14 px-3 border-b border-sidebar-border shrink-0 gap-2">
           <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-brand-gradient text-white font-bold text-sm shrink-0 select-none shadow-brand">
@@ -119,10 +204,11 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId, isMobileDrawe
           )}
         </div>
 
+        {/* Navigation Stream */}
         <ScrollArea className="flex-1 py-3 px-2">
-          {/* Main Cockpit Nav */}
+          {/* Main Group: Dashboard & Projects */}
           <nav className="space-y-0.5">
-            {mainNav.map((item) => (
+            {coreNav.map((item) => (
               <NavItem
                 key={item.label}
                 {...item}
@@ -132,18 +218,18 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId, isMobileDrawe
             ))}
           </nav>
 
-          {/* Organic & Keywords Section */}
+          {/* SEO & Research Suite */}
           {(!collapsed || isMobileDrawer) && (
             <div className="mt-4 mb-1.5 px-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5">
                 <Search className="h-3 w-3 text-brand" />
-                Organic & Keywords
+                SEO &amp; Research
               </p>
             </div>
           )}
           {collapsed && !isMobileDrawer && <div className="mt-3 mb-1 mx-auto w-4 h-px bg-sidebar-border" />}
           <nav className="space-y-0.5">
-            {organicTools.map((item) => (
+            {seoSuite.map((item) => (
               <NavItem
                 key={item.label}
                 {...item}
@@ -154,18 +240,18 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId, isMobileDrawe
             ))}
           </nav>
 
-          {/* Technical & Content Section */}
+          {/* Performance & Reports Suite */}
           {(!collapsed || isMobileDrawer) && (
             <div className="mt-4 mb-1.5 px-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5">
-                <Globe className="h-3 w-3 text-emerald-500" />
-                Audits & Content
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5">
+                <BarChart3 className="h-3 w-3 text-emerald-500" />
+                Analytics &amp; Reports
               </p>
             </div>
           )}
           {collapsed && !isMobileDrawer && <div className="mt-3 mb-1 mx-auto w-4 h-px bg-sidebar-border" />}
           <nav className="space-y-0.5">
-            {technicalTools.map((item) => (
+            {performanceSuite.map((item) => (
               <NavItem
                 key={item.label}
                 {...item}
@@ -176,18 +262,18 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId, isMobileDrawe
             ))}
           </nav>
 
-          {/* AEO & Delivery Section */}
+          {/* Management & Configuration Suite */}
           {(!collapsed || isMobileDrawer) && (
             <div className="mt-4 mb-1.5 px-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5">
-                <Brain className="h-3 w-3 text-indigo-500" />
-                AEO & Reports
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 flex items-center gap-1.5">
+                <Settings className="h-3 w-3 text-indigo-500" />
+                Workspace &amp; Config
               </p>
             </div>
           )}
           {collapsed && !isMobileDrawer && <div className="mt-3 mb-1 mx-auto w-4 h-px bg-sidebar-border" />}
           <nav className="space-y-0.5">
-            {aeoTools.map((item) => (
+            {settingsSuite.map((item) => (
               <NavItem
                 key={item.label}
                 {...item}
@@ -198,32 +284,21 @@ export function AppSidebar({ collapsed, onToggle, activeProjectId, isMobileDrawe
             ))}
           </nav>
 
+          {/* Quick Create Project */}
           {(!collapsed || isMobileDrawer) && (
             <div className="mt-4 pt-3 border-t border-sidebar-border">
               <Link
-                href="/projects/new"
+                href="/projects"
                 className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition-all duration-150 group"
               >
                 <div className="w-4 h-4 rounded border border-dashed border-sidebar-border group-hover:border-brand/40 flex items-center justify-center transition-colors">
                   <Plus className="h-2.5 w-2.5" />
                 </div>
-                New Project
+                New Workspace Project
               </Link>
             </div>
           )}
         </ScrollArea>
-
-        {/* Bottom nav */}
-        <div className="px-2 py-2 space-y-0.5 border-t border-sidebar-border shrink-0">
-          {bottomNav.map((item) => (
-            <NavItem
-              key={item.label}
-              {...item}
-              active={isActive(item.href)}
-              collapsed={collapsed && !isMobileDrawer}
-            />
-          ))}
-        </div>
       </aside>
     </TooltipProvider>
   )
@@ -243,18 +318,18 @@ function NavItem({ label, href, icon: Icon, active, collapsed, badge }: NavItemP
     <Link
       href={href}
       className={cn(
-        "relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150",
+        "relative flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs transition-all duration-150",
         active
           ? "bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-brand"
-          : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent font-medium"
+          : "text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent font-medium"
       )}
     >
       {active && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white/60 rounded-r-full" />
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white/70 rounded-r-full" />
       )}
       <Icon className={cn("h-4 w-4 shrink-0", active ? "opacity-100" : "opacity-75")} />
       {!collapsed && (
-        <span className="truncate flex-1 text-xs">{label}</span>
+        <span className="truncate flex-1">{label}</span>
       )}
       {!collapsed && badge && (
         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand/20 text-brand dark:bg-white/20 dark:text-white/90 tracking-wide shrink-0">
@@ -268,7 +343,7 @@ function NavItem({ label, href, icon: Icon, active, collapsed, badge }: NavItemP
     return (
       <Tooltip>
         <TooltipTrigger asChild>{item}</TooltipTrigger>
-        <TooltipContent side="right" className="flex items-center gap-2">
+        <TooltipContent side="right" className="flex items-center gap-2 text-xs">
           {label}
           {badge && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-brand text-white">{badge}</span>}
         </TooltipContent>

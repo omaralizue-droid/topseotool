@@ -16,6 +16,7 @@ import { CriticalIssues } from "@/components/dashboard/critical-issues"
 import { AIRecommendations } from "@/components/dashboard/ai-recommendations"
 import { ProjectSelector } from "@/components/dashboard/project-selector"
 import { EmptyState } from "@/components/ui/empty-state"
+import { UsageMetricsCard } from "@/components/dashboard/usage-metrics-card"
 
 export const metadata: Metadata = { title: "Dashboard Overview | TOPSEOTOOL" }
 
@@ -213,6 +214,9 @@ export default async function DashboardPage() {
           color="text-sky-600 dark:text-sky-400"
         />
       </div>
+
+      {/* 9 Core Platform Usage & Quota Meters */}
+      <UsageMetricsCard />
 
       {/* Grid Row 1: AI Visibility Chart & Competitor Benchmark */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">

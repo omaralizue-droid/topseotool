@@ -1,12 +1,16 @@
 "use client"
+
 import { useState } from "react"
 import {
   Bell, Search, HelpCircle, Building2, ChevronDown, Check, LogOut,
-  Settings, CreditCard, Menu, Sparkles, CheckCheck,
-  TrendingUp, AlertTriangle, ExternalLink, Zap
+  Settings, CreditCard, Menu, Sparkles, CheckCheck, Plus,
+  TrendingUp, AlertTriangle, ExternalLink, Zap, ShieldCheck,
+  Globe, KeyRound, Users, FileText, Layers, BarChart3,
+  PenTool, Gauge, Plug, BookOpen, MessageCircle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
 import {
@@ -21,6 +25,7 @@ import {
 import { getInitials } from "@/lib/utils"
 import { signOut } from "next-auth/react"
 import Link from "next/link"
+import { useEntitlements } from "@/hooks/use-entitlements"
 
 interface TopBarProps {
   user: {
@@ -56,16 +61,16 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
   {
     id: "2",
     title: "Core Web Vitals Pass",
-    desc: "LCP improved from 2.4s to 1.6s across 142 indexed URLs.",
+    desc: "LCP improved from 2.4s to 1.4s across 142 indexed URLs.",
     time: "42m ago",
     unread: true,
     type: "success",
-    link: "/projects/demo/seo-audit"
+    link: "/projects/demo/site-performance"
   },
   {
     id: "3",
-    title: "Competitor Movement Detected",
-    desc: "Ahrefs lost #1 position on 12 target high-intent keyword queries.",
+    title: "Competitor Rank Shift Detected",
+    desc: "Semrush lost #1 position on 8 high-intent keyword queries.",
     time: "2h ago",
     unread: false,
     type: "warning",
@@ -73,9 +78,35 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
   }
 ]
 
+// Instant search directory indexing all 19 sidebar capabilities
+const ALL_TOOLS_DIRECTORY = [
+  { title: "Dashboard", href: "/dashboard", desc: "Executive Cockpit & Overview", category: "Core" },
+  { title: "Projects", href: "/projects", desc: "Workspace Projects Hub", category: "Core" },
+  { title: "Site Audit", href: "/projects/demo/seo-audit", desc: "Technical Health & Crawl Diagnostics", category: "SEO" },
+  { title: "Keyword Research", href: "/projects/demo/keywords", desc: "Global Search Volume & KD Explorer", category: "SEO" },
+  { title: "Keyword Rank Tracker", href: "/projects/demo/rank-tracker", desc: "Daily Positions & SERP Radar", category: "SEO" },
+  { title: "Competitor Analysis", href: "/projects/demo/competitors", desc: "Keyword Overlap & Domain Gap", category: "SEO" },
+  { title: "Backlink Explorer", href: "/projects/demo/backlinks", desc: "Domain Rating & Toxic Link Audit", category: "SEO" },
+  { title: "Content Optimizer", href: "/projects/demo/content-optimizer", desc: "Real-Time NLP Content Score", category: "Content" },
+  { title: "SEO Writing Assistant", href: "/projects/demo/writing-assistant", desc: "Readability, Tone & Generative Salience", category: "Content" },
+  { title: "SERP Analyzer", href: "/projects/demo/serp-analyzer", desc: "Top 100 Correlation & Features", category: "SEO" },
+  { title: "Traffic Insights", href: "/projects/demo/traffic-insights", desc: "Organic Visits & AI Referrals", category: "Analytics" },
+  { title: "Site Performance", href: "/projects/demo/site-performance", desc: "Core Web Vitals (LCP, INP, CLS)", category: "Analytics" },
+  { title: "Reports", href: "/reports", desc: "Executive PDF Reports & Share Links", category: "Reports" },
+  { title: "Alerts", href: "/alerts", desc: "Automated SEO & Algorithm Surveillance", category: "Surveillance" },
+  { title: "Integrations", href: "/settings/integrations", desc: "GSC, GA4, Slack & BigQuery", category: "Config" },
+  { title: "API", href: "/settings/api", desc: "REST v1 Credentials & Webhooks", category: "Config" },
+  { title: "Team", href: "/settings/team", desc: "Workspace Members & 5-Tier RBAC", category: "Config" },
+  { title: "Billing", href: "/billing", desc: "Plan Tiers, Invoices & 9 Usage Meters", category: "Config" },
+  { title: "Settings", href: "/settings", desc: "Workspace Preferences & General Config", category: "Config" },
+]
+
 export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen }: TopBarProps) {
+  const { planKey } = useEntitlements()
+
   const [activeOrg, setActiveOrg] = useState(
-    organizations.find((o) => o.id === activeOrgId) ?? organizations[0] ?? { id: "default", name: "TOPSEOTOOL Enterprise", slug: "topseotool-hq" }
+    organizations.find((o) => o.id === activeOrgId) ??
+    organizations[0] ?? { id: "default", name: "TOPSEOTOOL Enterprise", slug: "topseotool-hq" }
   )
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -87,15 +118,12 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })))
   }
 
-  const QUICK_LINKS = [
-    { title: "SEO Health Audit", href: "/projects/demo/seo-audit", desc: "Core Web Vitals & Crawl Health" },
-    { title: "AI Brand Perception", href: "/projects/demo/ai-perception", desc: "ChatGPT & Claude sentiment analysis" },
-    { title: "Competitor Intelligence", href: "/projects/demo/competitors", desc: "Domain overlap & keyword gap" },
-    { title: "Executive Reports", href: "/projects/demo/reports", desc: "Client PDF export & share links" },
-  ]
-
-  const filteredLinks = searchQuery.trim()
-    ? QUICK_LINKS.filter(l => l.title.toLowerCase().includes(searchQuery.toLowerCase()) || l.desc.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredTools = searchQuery.trim()
+    ? ALL_TOOLS_DIRECTORY.filter(
+        l => l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+             l.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+             l.category.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     : []
 
   return (
@@ -112,24 +140,26 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
         <Menu className="h-5 w-5" />
       </Button>
 
-      {/* Organization Selector */}
+      {/* 1. Workspace Selector */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 gap-2 px-2.5 text-xs font-medium hover:bg-accent/80 border border-border/60 rounded-lg max-w-[150px] sm:max-w-none transition-all shadow-xs"
+            className="h-8 gap-2 px-2.5 text-xs font-medium hover:bg-accent/80 border border-border/60 rounded-lg max-w-[160px] sm:max-w-none transition-all shadow-xs"
           >
             <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-brand to-indigo-600 text-white flex items-center justify-center font-bold text-[10px] shadow-xs shrink-0">
               {activeOrg.name[0]?.toUpperCase()}
             </div>
-            <span className="truncate max-w-[80px] sm:max-w-[130px] font-semibold text-foreground tracking-tight">{activeOrg.name}</span>
+            <span className="truncate max-w-[90px] sm:max-w-[140px] font-semibold text-foreground tracking-tight">
+              {activeOrg.name}
+            </span>
             <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-60 p-1.5 shadow-xl border-border/80 backdrop-blur-lg">
+        <DropdownMenuContent align="start" className="w-64 p-1.5 shadow-xl border-border/80 backdrop-blur-lg">
           <DropdownMenuLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1">
-            Workspaces & Orgs
+            Active Workspace
           </DropdownMenuLabel>
           <DropdownMenuGroup className="space-y-0.5">
             {organizations.length > 0 ? (
@@ -154,28 +184,22 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
             )}
           </DropdownMenuGroup>
           <DropdownMenuSeparator className="my-1" />
-          <DropdownMenuItem asChild className="text-xs text-brand font-medium px-2.5 py-1.5 cursor-pointer">
-            <Link href="/settings">
-              <Sparkles className="h-3.5 w-3.5 mr-2" /> Upgrade to Enterprise Plus
+          <DropdownMenuItem asChild className="text-xs font-medium px-2.5 py-1.5 cursor-pointer">
+            <Link href="/settings/team">
+              <Plus className="h-3.5 w-3.5 mr-2 text-brand" /> Manage Workspaces &amp; Team
             </Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Live AI Engine Status Pill (Desktop only) */}
-      <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[11px] font-medium ml-1">
-        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-        <span>AEO Engine Active</span>
-      </div>
-
-      {/* Global Search with instant suggestions dropdown */}
+      {/* 2. Global Search with instant multi-tool suggestions */}
       <div className="relative flex-1 max-w-xs sm:max-w-md ml-1 sm:ml-2">
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tools, metrics, or docs... (Ctrl + K)"
+            placeholder="Search tools, metrics, keywords... (⌘K)"
             className="pl-8 pr-12 h-8 text-xs bg-muted/40 hover:bg-muted/60 border-border/60 focus-visible:ring-1 focus-visible:ring-brand rounded-lg transition-all"
           />
           <kbd className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:inline-flex h-4 select-none items-center gap-1 rounded border border-border/60 bg-muted px-1.5 font-mono text-[9px] font-medium text-muted-foreground">
@@ -185,26 +209,33 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
 
         {/* Live Search Quick Results */}
         {searchQuery.trim().length > 0 && (
-          <div className="absolute top-full mt-1.5 left-0 w-full bg-popover/95 backdrop-blur-md border border-border rounded-xl shadow-2xl p-2 z-50 animate-in fade-in-0 zoom-in-95">
-            <div className="text-[10px] font-semibold text-muted-foreground uppercase px-2 py-1">Quick Tools</div>
-            {filteredLinks.length > 0 ? (
-              filteredLinks.map((link) => (
+          <div className="absolute top-full mt-1.5 left-0 w-full bg-popover/95 backdrop-blur-md border border-border rounded-xl shadow-2xl p-2 z-50 animate-in fade-in-0 zoom-in-95 max-h-80 overflow-y-auto">
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase px-2 py-1">
+              Matching Tools &amp; Pages ({filteredTools.length})
+            </div>
+            {filteredTools.length > 0 ? (
+              filteredTools.map((tool) => (
                 <Link
-                  key={link.title}
-                  href={link.href}
+                  key={tool.title}
+                  href={tool.href}
                   onClick={() => setSearchQuery("")}
                   className="flex items-center justify-between p-2 rounded-lg hover:bg-accent text-xs group transition-colors"
                 >
                   <div>
-                    <div className="font-semibold text-foreground group-hover:text-brand transition-colors">{link.title}</div>
-                    <div className="text-[11px] text-muted-foreground">{link.desc}</div>
+                    <div className="font-semibold text-foreground group-hover:text-brand transition-colors flex items-center gap-1.5">
+                      <span>{tool.title}</span>
+                      <Badge variant="outline" className="text-[9px] py-0 px-1 font-normal text-muted-foreground">
+                        {tool.category}
+                      </Badge>
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">{tool.desc}</div>
                   </div>
                   <Zap className="h-3.5 w-3.5 text-muted-foreground group-hover:text-brand" />
                 </Link>
               ))
             ) : (
               <div className="p-3 text-center text-xs text-muted-foreground">
-                No matching results found for "{searchQuery}"
+                No tools matching "{searchQuery}"
               </div>
             )}
           </div>
@@ -213,14 +244,8 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
 
       {/* Right Actions */}
       <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
-        {/* Help Link */}
-        <Button variant="ghost" size="icon" className="hidden sm:flex h-8 w-8 text-muted-foreground hover:text-foreground rounded-lg" asChild>
-          <Link href="/blog" title="Knowledge Base & Playbooks">
-            <HelpCircle className="h-4 w-4" />
-          </Link>
-        </Button>
 
-        {/* Real-time Notifications Feed */}
+        {/* 3. Notifications Feed */}
         <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
           <DropdownMenuTrigger asChild>
             <Button
@@ -238,7 +263,7 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
           <DropdownMenuContent align="end" className="w-80 sm:w-96 p-0 shadow-2xl border-border/80 backdrop-blur-xl">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm">Notifications</span>
+                <span className="font-semibold text-sm">Real-Time Alerts</span>
                 {unreadCount > 0 && (
                   <span className="text-[10px] text-brand bg-brand-muted px-2 py-0.5 rounded-full font-bold">
                     {unreadCount} new
@@ -303,23 +328,71 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
 
             <div className="p-2 border-t border-border/60 bg-muted/20 text-center">
               <Link
-                href="/settings"
+                href="/alerts"
                 onClick={() => setNotificationsOpen(false)}
                 className="text-xs text-muted-foreground hover:text-foreground font-medium"
               >
-                Manage alert preferences →
+                Manage all automated alerts →
               </Link>
             </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* 4. Help Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-lg"
+              aria-label="Help & Documentation"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-60 p-1.5 shadow-2xl border-border/80 backdrop-blur-xl">
+            <DropdownMenuLabel className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1">
+              Help &amp; Resources
+            </DropdownMenuLabel>
+            <DropdownMenuGroup className="space-y-0.5">
+              <DropdownMenuItem asChild className="cursor-pointer text-xs px-2.5 py-2 rounded-md">
+                <Link href="/blog">
+                  <BookOpen className="h-3.5 w-3.5 mr-2 text-brand" /> SEO Playbooks &amp; Guides
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="cursor-pointer text-xs px-2.5 py-2 rounded-md">
+                <Link href="/settings/api">
+                  <KeyRound className="h-3.5 w-3.5 mr-2 text-brand" /> REST API Documentation
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-xs px-2.5 py-2 rounded-md flex items-center justify-between text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Systems Operational
+                </span>
+                <span className="text-[10px] font-mono">99.99%</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild className="cursor-pointer text-xs px-2.5 py-2 rounded-md">
+                <Link href="/pricing#enterprise">
+                  <MessageCircle className="h-3.5 w-3.5 mr-2 text-brand" /> Contact Priority Support
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
 
         {/* Theme Toggle */}
         <ThemeToggle />
 
-        {/* User Menu */}
+        {/* 5. User Profile Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full ml-0.5 ring-1 ring-border/80 hover:ring-brand/50 transition-all" aria-label="User menu">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full ml-0.5 ring-1 ring-border/80 hover:ring-brand/50 transition-all"
+              aria-label="User menu"
+            >
               <Avatar className="h-7 w-7">
                 <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? "User"} />
                 <AvatarFallback className="text-xs bg-gradient-to-tr from-brand to-indigo-600 text-white font-semibold">
@@ -328,24 +401,39 @@ export function TopBar({ user, organizations = [], activeOrgId, onMobileMenuOpen
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-60 p-1.5 shadow-2xl border-border/80 backdrop-blur-xl">
+          <DropdownMenuContent align="end" className="w-64 p-1.5 shadow-2xl border-border/80 backdrop-blur-xl">
             <DropdownMenuLabel className="px-2.5 py-2">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                <p className="font-semibold truncate text-sm">{user?.name ?? "Executive User"}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 truncate">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <p className="font-semibold truncate text-sm text-foreground">
+                    {user?.name ?? "Executive User"}
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-[10px] font-bold border-brand/40 text-brand py-0 px-1.5">
+                  {planKey}
+                </Badge>
               </div>
-              <p className="text-xs text-muted-foreground font-normal truncate mt-0.5 pl-4">{user?.email ?? "admin@topseotool.net"}</p>
+              <p className="text-xs text-muted-foreground font-normal truncate mt-0.5 pl-4">
+                {user?.email ?? "admin@topseotool.net"}
+              </p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup className="space-y-0.5">
               <DropdownMenuItem asChild className="cursor-pointer text-xs px-2.5 py-2 rounded-md">
-                <Link href="/settings"><Settings className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Account & API Keys</Link>
+                <Link href="/settings">
+                  <Settings className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Workspace Settings
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="cursor-pointer text-xs px-2.5 py-2 rounded-md">
-                <Link href="/settings/team"><Building2 className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Team & Workspace Access</Link>
+                <Link href="/settings/team">
+                  <Users className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Team &amp; Permissions (RBAC)
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="cursor-pointer text-xs px-2.5 py-2 rounded-md">
-                <Link href="/billing"><CreditCard className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Subscription & Invoices</Link>
+                <Link href="/billing">
+                  <CreditCard className="h-3.5 w-3.5 mr-2 text-muted-foreground" /> Billing &amp; Usage Limits
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

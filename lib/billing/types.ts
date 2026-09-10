@@ -81,3 +81,38 @@ export interface BillingProvider {
     signature: string
   ): Promise<WebhookResult>
 }
+
+export type BillingCadence = "MONTHLY" | "ANNUAL"
+
+export interface BillingInvoice {
+  id: string
+  number: string
+  amountUsd: number
+  currency: string
+  status: "paid" | "open" | "void" | "uncollectible" | "failed"
+  date: string
+  periodStart: string
+  periodEnd: string
+  pdfUrl: string
+  hostedInvoiceUrl: string
+  planName: string
+  paymentMethod?: {
+    brand: string
+    last4: string
+  }
+}
+
+export interface CouponValidation {
+  code: string
+  valid: boolean
+  discountType: "PERCENT" | "FIXED"
+  discountValue: number
+  description: string
+  appliesTo: "ALL" | "ANNUAL_ONLY" | "PRO_AGENCY"
+}
+
+export interface ChangePlanOptions {
+  organizationId: string
+  newPlanKey: PlanKey
+  cadence: BillingCadence
+}

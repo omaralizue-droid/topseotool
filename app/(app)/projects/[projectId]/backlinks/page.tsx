@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { FeatureGate } from "@/components/billing/feature-gate"
 
 interface BacklinkRecord {
   id: string
@@ -165,8 +166,9 @@ export default function BacklinksIntelligencePage() {
         </div>
       </div>
 
-      {/* Scorecards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <FeatureGate feature="backlink_analysis" blurPreview>
+        {/* Scorecards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Domain Rating */}
         <Card className="border-border/80 shadow-xs">
           <CardContent className="p-5 space-y-2">
@@ -356,6 +358,7 @@ export default function BacklinksIntelligencePage() {
           </table>
         </div>
       </Card>
+      </FeatureGate>
     </div>
   )
 }

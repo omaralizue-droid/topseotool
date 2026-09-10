@@ -24,6 +24,7 @@ enum OrgRole {
   ADMIN
   MANAGER
   MEMBER
+  API_USER
 }
 
 enum PlanTier {
@@ -202,6 +203,7 @@ model Organization {
   projects     Project[]
   subscription Subscription?
   usageRecords UsageRecord[]
+  apiKeys      ApiKey[]
 
   @@map("organizations")
 }
@@ -221,6 +223,27 @@ model OrganizationMember {
   @@index([userId])
   @@index([organizationId])
   @@map("organization_members")
+}
+
+model ApiKey {
+  id              String    @id @default(cuid())
+  organizationId  String
+  userId          String?
+  name            String
+  keyHash         String    @unique
+  keyPrefix       String
+  scopes          String[]  @default(["read", "write"])
+  rateLimitPerMin Int       @default(120)
+  totalRequests   Int       @default(0)
+  lastUsedAt      DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([keyHash])
+  @@map("api_keys")
 }
 
 // ===========================================================================

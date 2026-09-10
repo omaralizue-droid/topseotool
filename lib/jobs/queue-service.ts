@@ -70,6 +70,49 @@ class BackgroundQueueManager {
     return this.jobs.get(jobId) ?? null
   }
 
+  getAllJobs(): JobRecord[] {
+    return Array.from(this.jobs.values()).sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    )
+  }
+
+  getFailedJobs(): JobRecord[] {
+    return this.getAllJobs().filter((j) => j.status === "FAILED")
+  }
+
+  retryJob(jobId: string): boolean {
+    const job = this.jobs.get(jobId)
+    if (!job) return false
+    job.status = "PENDING"
+    job.error = undefined
+    job.progress = 0
+    job.updatedAt = new Date()
+    setTimeout(() => this.processNext(), 50)
+    return true
+  }
+
+  retryAllFailed(): number {
+    const failed = this.getFailedJobs()
+    for (const j of failed) {
+      j.status = "PENDING"
+      j.error = undefined
+      j.progress = 0
+      j.updatedAt = new Date()
+    }
+    if (failed.length > 0) {
+      setTimeout(() => this.processNext(), 50)
+    }
+    return failed.length
+  }
+
+  purgeCompletedAndFailed(): void {
+    for (const [id, j] of this.jobs.entries()) {
+      if (j.status === "COMPLETED" || j.status === "FAILED") {
+        this.jobs.delete(id)
+      }
+    }
+  }
+
   private async processNext() {
     if (this.isProcessing) return
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import {
@@ -9,16 +9,48 @@ import {
   TrendingUp, ShieldCheck, Sparkles, CheckCircle2,
   RefreshCw, Download, Share2, Play, ChevronRight,
   BarChart3, Activity, Target, ArrowUpRight, Award,
-  SlidersHorizontal, Check, Search, FileEdit
+  SlidersHorizontal, Check, Search, FileEdit, PenTool, Gauge,
+  LayoutDashboard, Bell, Monitor
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { UsageMetricsCard } from "@/components/dashboard/usage-metrics-card"
 
 export default function ProjectOverviewPage() {
   const params = useParams()
   const projectId = (params?.projectId as string) || "demo"
-  const primaryDomain = "topseotool.net"
+
+  const [projectData, setProjectData] = useState<any>(null)
+  const [loadingProject, setLoadingProject] = useState(false)
+
+  useEffect(() => {
+    async function loadProject() {
+      try {
+        setLoadingProject(true)
+        const res = await fetch(`/api/projects/${projectId}`)
+        if (res.ok) {
+          const json = await res.json()
+          if (json.ok && json.data) {
+            setProjectData(json.data)
+          }
+        }
+      } catch {
+        // graceful fallback to defaults
+      } finally {
+        setLoadingProject(false)
+      }
+    }
+    loadProject()
+  }, [projectId])
+
+  const primaryDomain = projectData?.domain || (projectId === "demo" ? "topseotool.net" : "example.com")
+  const targetCountry = projectData?.country || "United States"
+  const targetLanguage = projectData?.language || "English"
+  const targetSearchEngine = projectData?.searchEngine || "Google"
+  const targetDevice = projectData?.device || "Desktop"
+  const targetKeywordsCount = projectData?.keywordsCount || 5000
+  const targetCompetitorsCount = projectData?.competitorsCount || 10
 
   const [timeframe, setTimeframe] = useState<"7d" | "30d" | "90d">("30d")
   const [isScanning, setIsScanning] = useState(false)
@@ -137,12 +169,20 @@ export default function ProjectOverviewPage() {
           stats: "DR 84"
         },
         {
-          key: "content-opportunities",
-          label: "Content Opportunities",
+          key: "serp-analyzer",
+          label: "SERP Analyzer",
           icon: Layers,
-          desc: "High-intent keyword gaps and AI-generated content clusters",
-          badge: null,
-          stats: "12 Ideas"
+          desc: "Top 100 organic search correlation, volatility & SERP feature radar",
+          badge: "Live SERP",
+          stats: "Top 100"
+        },
+        {
+          key: "traffic-insights",
+          label: "Traffic Insights",
+          icon: BarChart3,
+          desc: "Organic search sessions, AI referral share, and top landing pages",
+          badge: "Real-Time",
+          stats: "141K Visits"
         }
       ]
     },
@@ -160,12 +200,28 @@ export default function ProjectOverviewPage() {
           stats: "0 Critical"
         },
         {
+          key: "site-performance",
+          label: "Site Performance",
+          icon: Gauge,
+          desc: "Google CrUX Core Web Vitals (LCP, INP, CLS) & speed test",
+          badge: "CrUX 96",
+          stats: "Fast 1.4s"
+        },
+        {
           key: "content-optimizer",
           label: "Content Optimizer",
           icon: FileEdit,
           desc: "Real-time live SEO score editor, NLP/LSI keyword recommendations & readability",
           badge: "AI Scorer",
           stats: "Score 82"
+        },
+        {
+          key: "writing-assistant",
+          label: "SEO Writing Assistant",
+          icon: PenTool,
+          desc: "Real-time readability, tone of voice, keyword density and AI polishing",
+          badge: "NLP",
+          stats: "Score 96"
         },
         {
           key: "competitors",
@@ -276,6 +332,119 @@ export default function ProjectOverviewPage() {
     }
   ]
 
+  const CORE_PROJECT_SECTIONS = [
+    {
+      id: "overview",
+      name: "Overview",
+      href: `/projects/${projectId}`,
+      icon: LayoutDashboard,
+      status: "Active Cockpit",
+      desc: "Live performance scorecards, AI engine matrix, and prioritized sprint recommendations",
+      stats: "94/100 Score",
+      badge: "Real-Time"
+    },
+    {
+      id: "seo-health",
+      name: "SEO Health",
+      href: `/projects/${projectId}/seo-health`,
+      icon: Activity,
+      status: "Healthy",
+      desc: "Holistic site technical health covering Core Web Vitals, crawl errors, schema, and mobile usability",
+      stats: "94 Health Score",
+      badge: "0 Blockers"
+    },
+    {
+      id: "visibility",
+      name: "Visibility",
+      href: `/projects/${projectId}/visibility`,
+      icon: Brain,
+      status: "AEO Radar",
+      desc: "Generative search visibility across ChatGPT, Claude, Perplexity, and Google Gemini",
+      stats: "92% AI Share",
+      badge: "201 Citations"
+    },
+    {
+      id: "rankings",
+      name: "Rankings",
+      href: `/projects/${projectId}/rankings`,
+      icon: TrendingUp,
+      status: "Daily Tracker",
+      desc: "Daily keyword position radar, SERP shifts, and Google AI Overview snippet presence",
+      stats: "Top 3: 14",
+      badge: "Daily"
+    },
+    {
+      id: "keywords",
+      name: "Keywords",
+      href: `/projects/${projectId}/keywords`,
+      icon: Search,
+      status: "Explorer",
+      desc: "5,000 tracked keywords, search volumes, KD% difficulty, intent breakdown & SERP previews",
+      stats: `${targetKeywordsCount.toLocaleString()} Keywords`,
+      badge: "18.1K Vol"
+    },
+    {
+      id: "competitors",
+      name: "Competitors",
+      href: `/projects/${projectId}/competitors`,
+      icon: Users2,
+      status: "Rival Radar",
+      desc: "Track 10 key competitor domains, compare domain authority, content gaps, and search overlap",
+      stats: `${targetCompetitorsCount} Rivals Tracked`,
+      badge: "+14% Gap"
+    },
+    {
+      id: "backlinks",
+      name: "Backlinks",
+      href: `/projects/${projectId}/backlinks`,
+      icon: Link2,
+      status: "Link Explorer",
+      desc: "Domain Rating (DR 84), active backlink profile, anchor distributions, and toxic link disavow",
+      stats: "DR 84 / 14.2K Links",
+      badge: "Toxic Audit"
+    },
+    {
+      id: "site-audit",
+      name: "Site Audit",
+      href: `/projects/${projectId}/seo-audit`,
+      icon: ShieldCheck,
+      status: "Deep Crawler",
+      desc: "Comprehensive page crawl diagnostics, broken links, redirect chains, and structured data validation",
+      stats: "0 Critical / 7 Warnings",
+      badge: "Passed"
+    },
+    {
+      id: "content",
+      name: "Content",
+      href: `/projects/${projectId}/content`,
+      icon: FileEdit,
+      status: "NLP Scorer",
+      desc: "Content inventory scorecards, decay detection, keyword cannibalization warnings, and editorial fixes",
+      stats: "86 Avg Score",
+      badge: "Fresh"
+    },
+    {
+      id: "reports",
+      name: "Reports",
+      href: `/projects/${projectId}/reports`,
+      icon: FileText,
+      status: "Executive PDF",
+      desc: "Automated white-label client SEO reports, executive performance summaries, and live share links",
+      stats: "Weekly PDF Ready",
+      badge: "Export"
+    },
+    {
+      id: "alerts",
+      name: "Alerts",
+      href: `/projects/${projectId}/alerts`,
+      icon: Bell,
+      status: "24/7 Surveillance",
+      desc: "Instant notifications for ranking shifts, algorithm volatility, toxic backlinks, and crawl errors",
+      stats: "4 Events / Active",
+      badge: "Slack & Email"
+    },
+  ]
+
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-fade-in">
       {/* Top Banner & Cockpit Header */}
@@ -295,12 +464,16 @@ export default function ProjectOverviewPage() {
                 ● Live Monitoring
               </Badge>
               <Badge variant="secondary" className="text-xs font-medium">
-                US-East (Global)
+                {targetSearchEngine} ({targetCountry})
               </Badge>
             </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1.5 flex-wrap">
               <span className="flex items-center gap-1.5 font-mono">
                 <Globe className="h-3.5 w-3.5 text-brand" /> https://{primaryDomain}
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1">
+                <Monitor className="h-3.5 w-3.5 text-indigo-500" /> {targetDevice} • {targetLanguage}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
@@ -350,6 +523,98 @@ export default function ProjectOverviewPage() {
             <RefreshCw className={`h-3.5 w-3.5 ${isScanning ? "animate-spin" : ""}`} />
             {isScanning ? "Auditing..." : scanComplete ? "Audit Complete!" : "Run Full Scan"}
           </Button>
+        </div>
+      </div>
+
+      {/* Project Target Configuration Card */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 p-4 rounded-2xl bg-card border border-border/80 shadow-xs">
+        <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">Project Domain</span>
+          <span className="text-xs font-mono font-bold text-foreground truncate block mt-0.5">{primaryDomain}</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">Country</span>
+          <span className="text-xs font-semibold text-foreground truncate block mt-0.5">🇺🇸 {targetCountry}</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">Language</span>
+          <span className="text-xs font-semibold text-foreground truncate block mt-0.5">{targetLanguage}</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">Search Engine</span>
+          <span className="text-xs font-semibold text-foreground truncate block mt-0.5">{targetSearchEngine}</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">Device</span>
+          <span className="text-xs font-semibold text-foreground truncate block mt-0.5">{targetDevice}</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">Keywords Capacity</span>
+          <span className="text-xs font-mono font-bold text-brand truncate block mt-0.5">{targetKeywordsCount.toLocaleString()}</span>
+        </div>
+        <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground block">Competitors</span>
+          <span className="text-xs font-mono font-bold text-indigo-500 truncate block mt-0.5">{targetCompetitorsCount} Rivals</span>
+        </div>
+      </div>
+
+      {/* 11 Dedicated Project Sections Grid */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+              <LayoutDashboard className="h-4.5 w-4.5 text-brand" /> 11 Core Project Sections
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Dedicated intelligence hubs configured for {primaryDomain}
+            </p>
+          </div>
+          <Badge variant="outline" className="text-xs font-semibold">
+            11 Modules Active
+          </Badge>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+          {CORE_PROJECT_SECTIONS.map((sec) => {
+            const SecIcon = sec.icon
+            const isCurrent = sec.id === "overview"
+            return (
+              <Link
+                key={sec.id}
+                href={sec.href}
+                className={`group p-3.5 rounded-xl border transition-all flex flex-col justify-between ${
+                  isCurrent
+                    ? "bg-brand/5 border-brand/40 shadow-xs"
+                    : "bg-card border-border/80 hover:border-brand/50 hover:shadow-xs"
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-1 mb-2">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                      isCurrent ? "bg-brand text-brand-foreground" : "bg-muted text-muted-foreground group-hover:text-brand group-hover:bg-brand/10 transition-colors"
+                    }`}>
+                      <SecIcon className="h-4 w-4" />
+                    </div>
+                    <Badge variant={isCurrent ? "brand" : "secondary"} className="text-[9px] py-0 px-1.5 font-bold">
+                      {sec.badge}
+                    </Badge>
+                  </div>
+                  <h3 className="font-bold text-xs text-foreground group-hover:text-brand transition-colors flex items-center justify-between">
+                    <span>{sec.name}</span>
+                    <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 text-brand transition-opacity" />
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground line-clamp-2 mt-1 leading-snug">
+                    {sec.desc}
+                  </p>
+                </div>
+
+                <div className="pt-2.5 mt-2.5 border-t border-border/40 flex items-center justify-between text-[10px]">
+                  <span className="font-mono text-muted-foreground">{sec.status}</span>
+                  <span className="font-semibold text-foreground">{sec.stats}</span>
+                </div>
+              </Link>
+            )
+          })}
         </div>
       </div>
 
@@ -497,6 +762,9 @@ export default function ProjectOverviewPage() {
           ))}
         </div>
       </div>
+
+      {/* 9 Core Usage & Workspace Limit Meters */}
+      <UsageMetricsCard />
 
       {/* Comprehensive Categorized Tool Suites */}
       <div className="space-y-6">

@@ -63,21 +63,22 @@ export default function PricingPage() {
       </div>
 
       {/* Pricing Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {PLAN_ORDER.map((key) => {
           const plan = PLANS[key]
           const isPopular = plan.badge !== undefined
           const displayPrice = billingInterval === "yearly" ? plan.yearlyPrice : plan.price
+          const isCustom = plan.isCustomPrice
 
           return (
             <Card
               key={key}
               className={`flex flex-col justify-between relative transition-all ${
-                isPopular ? "border-brand shadow-lg shadow-brand/10 scale-[1.02] bg-card" : "border-border bg-card/60"
+                isPopular ? "border-brand shadow-lg shadow-brand/10 scale-[1.02] bg-card z-10" : "border-border bg-card/60"
               }`}
             >
               {plan.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand text-brand-foreground px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand text-brand-foreground px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
                   {plan.badge}
                 </div>
               )}
@@ -85,28 +86,37 @@ export default function PricingPage() {
                 <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
                 <CardDescription className="text-xs min-h-[36px] mt-1">{plan.description}</CardDescription>
                 <div className="pt-4 pb-2 flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold font-mono-nums">${displayPrice}</span>
-                  <span className="text-xs text-muted-foreground font-medium">/month</span>
+                  {isCustom ? (
+                    <span className="text-3xl font-extrabold font-mono text-foreground">Custom</span>
+                  ) : (
+                    <>
+                      <span className="text-4xl font-extrabold font-mono-nums">${displayPrice}</span>
+                      <span className="text-xs text-muted-foreground font-medium">/month</span>
+                    </>
+                  )}
                 </div>
-                {billingInterval === "yearly" && plan.price > 0 && (
+                {billingInterval === "yearly" && !isCustom && plan.price > 0 && (
                   <p className="text-[11px] text-emerald-600 font-medium">Billed annually (${displayPrice * 12}/yr)</p>
+                )}
+                {isCustom && (
+                  <p className="text-[11px] text-brand font-medium">Dedicated scale & SLA</p>
                 )}
               </CardHeader>
               <CardContent className="space-y-3 flex-1">
-                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Included Quotas & Features</div>
-                <ul className="space-y-2.5 text-xs">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Included Quotas</div>
+                <ul className="space-y-2 text-xs">
                   {plan.features.map((feat) => (
-                    <li key={feat} className="flex items-start gap-2 text-foreground">
-                      <Check className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
+                    <li key={feat} className="flex items-start gap-1.5 text-foreground text-[11px] leading-snug">
+                      <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
                       <span>{feat}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
               <CardFooter className="pt-4">
-                <Button className="w-full" variant={isPopular ? "brand" : "outline"} asChild>
-                  <Link href={`/signup?plan=${key}`}>
-                    {key === "FREE" ? "Get Started Free" : `Upgrade to ${plan.name}`}
+                <Button className="w-full text-xs" variant={isPopular ? "brand" : isCustom ? "default" : "outline"} asChild>
+                  <Link href={isCustom ? "/contact" : `/signup?plan=${key}`}>
+                    {key === "FREE" ? "Get Started Free" : isCustom ? "Contact Enterprise Sales" : `Upgrade to ${plan.name}`}
                   </Link>
                 </Button>
               </CardFooter>

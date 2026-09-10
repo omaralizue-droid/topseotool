@@ -23,12 +23,34 @@ export async function GET() {
     where: { organizationId: membership.organizationId, status: { not: "ARCHIVED" } },
     orderBy: { updatedAt: "desc" },
     include: {
+      websites: { where: { isPrimary: true } },
       _count: {
-        select: { seoAudits: true, aiVisibilityScans: true, brandMentions: true, aiCitations: true }
+        select: { seoAudits: true, aiVisibilityScans: true, brandMentions: true, aiCitations: true, competitors: true }
       }
     }
   })
-  return NextResponse.json({ ok: true, data: projects })
+
+  const formatted = projects.map(p => {
+    let parsedMeta: any = {}
+    try {
+      if (p.description && p.description.startsWith("{")) {
+        parsedMeta = JSON.parse(p.description)
+      }
+    } catch {}
+
+    return {
+      ...p,
+      domain: p.websites?.[0]?.domain || p.name,
+      country: parsedMeta.country || "United States",
+      language: parsedMeta.language || "English",
+      searchEngine: parsedMeta.searchEngine || "Google",
+      device: parsedMeta.device || "Desktop",
+      keywordsCount: parsedMeta.keywordsCount || 5000,
+      competitorsCount: parsedMeta.competitorsCount || p._count?.competitors || 10,
+    }
+  })
+
+  return NextResponse.json({ ok: true, data: formatted })
 }
 
 export async function POST(req: NextRequest) {
@@ -64,10 +86,20 @@ export async function POST(req: NextRequest) {
     // ✅ Entitlement check — throws ValidationError if project limit reached
     await checkEntitlement(membership.organizationId, "CREATE_PROJECT")
 
+    const targetMeta = JSON.stringify({
+      country: parsed.data.country || "United States",
+      language: parsed.data.language || "English",
+      searchEngine: parsed.data.searchEngine || "Google",
+      device: parsed.data.device || "Desktop",
+      keywordsCount: parsed.data.keywordsCount || 5000,
+      competitorsCount: parsed.data.competitorsCount || 10,
+      userDescription: parsed.data.description || "",
+    })
+
     const project = await db.project.create({
       data: {
         name: parsed.data.name,
-        description: parsed.data.description,
+        description: targetMeta,
         color: parsed.data.color,
         organizationId: membership.organizationId,
       }
@@ -82,6 +114,27 @@ export async function POST(req: NextRequest) {
         isPrimary: true,
       }
     })
+
+    // Auto-create competitors if provided
+    if (parsed.data.seedCompetitors) {
+      const competitorDomains = parsed.data.seedCompetitors
+        .split(/[\n,]+/)
+        .map(d => d.trim().replace(/^https?:\/\//, "").replace(/\/.*$/, ""))
+        .filter(Boolean)
+        .slice(0, parsed.data.competitorsCount || 10)
+
+      for (const compDomain of competitorDomains) {
+        await db.competitor.create({
+          data: {
+            projectId: project.id,
+            domain: compDomain,
+            name: compDomain.split(".")[0]?.toUpperCase() ?? compDomain,
+            seoScore: Math.floor(Math.random() * 25) + 70,
+            aiVisibility: Math.floor(Math.random() * 30) + 65,
+          }
+        }).catch(() => {})
+      }
+    }
 
     return NextResponse.json({ ok: true, data: project }, { status: 201 })
   } catch (err) {

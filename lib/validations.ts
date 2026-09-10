@@ -24,6 +24,14 @@ export const createProjectSchema = z.object({
       /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/,
       "Enter a valid domain (e.g. example.com)"
     ),
+  country: z.string().default("United States"),
+  language: z.string().default("English"),
+  searchEngine: z.string().default("Google"),
+  device: z.enum(["Desktop", "Mobile"]).default("Desktop"),
+  keywordsCount: z.coerce.number().int().min(1).default(5000),
+  competitorsCount: z.coerce.number().int().min(1).default(10),
+  seedKeywords: z.string().optional(),
+  seedCompetitors: z.string().optional(),
   description: z.string().max(256).optional(),
   color: z.string().optional(),
 });

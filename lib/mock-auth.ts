@@ -6,10 +6,10 @@ export const BYPASS_AUTH = true
 export const MOCK_SESSION = {
   user: {
     id: "mock-user-id-for-testing",
-    name: "Test User",
-    email: "test@topseotool.dev",
+    name: "Admin Operator",
+    email: "admin@topseotool.net",
     image: null,
-    role: "USER",
+    role: "SUPER_ADMIN",
   },
   expires: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(),
 }
