@@ -1,4 +1,3 @@
-import { MarketingNav } from "@/components/marketing/marketing-nav"
 import { MarketingFooter } from "@/components/marketing/marketing-footer"
 import { OrganizationJsonLd, WebSiteJsonLd, SoftwareApplicationJsonLd } from "@/components/seo/json-ld"
 
@@ -8,7 +7,6 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <OrganizationJsonLd />
       <WebSiteJsonLd />
       <SoftwareApplicationJsonLd />
-      <MarketingNav />
       <main className="flex-1">{children}</main>
       <MarketingFooter />
     </div>

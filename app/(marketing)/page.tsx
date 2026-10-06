@@ -1,29 +1,29 @@
 import type { Metadata } from "next"
-import { InteractiveHomeView } from "@/components/marketing/interactive-home-view"
+import { AiSeoUnifiedTool } from "@/components/tools/ai-seo-unified-tool"
 
 export const metadata: Metadata = {
-  title: "The SEO Intelligence Platform Built for Serious Growth | TOPSEOTOOL",
+  title: "AI Platforms Rank & SEO Checker — TopSEOTool",
   description:
-    "Audit websites, discover profitable keywords, track rankings, analyze competitors and optimize content from one powerful SEO platform.",
+    "Check your brand ranking across ChatGPT, Perplexity, Gemini, Claude, Copilot & Grok, plus comprehensive On-Page & Technical SEO audit.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "The SEO Intelligence Platform Built for Serious Growth | TOPSEOTOOL",
+    title: "AI Platforms Rank & SEO Checker — TopSEOTool",
     description:
-      "Audit websites, discover profitable keywords, track rankings, analyze competitors and optimize content from one powerful SEO platform.",
+      "Check your brand ranking across ChatGPT, Perplexity, Gemini, Claude, Copilot & Grok, plus comprehensive On-Page & Technical SEO audit.",
     url: "https://topseotool.net",
-    siteName: "TOPSEOTOOL",
+    siteName: "TopSEOTool",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The SEO Intelligence Platform Built for Serious Growth | TOPSEOTOOL",
+    title: "AI Platforms Rank & SEO Checker — TopSEOTool",
     description:
-      "Audit websites, discover profitable keywords, track rankings, analyze competitors and optimize content from one powerful SEO platform.",
+      "Check your brand ranking across ChatGPT, Perplexity, Gemini, Claude, Copilot & Grok, plus comprehensive On-Page & Technical SEO audit.",
   },
 }
 
 export default function HomePage() {
-  return <InteractiveHomeView />
+  return <AiSeoUnifiedTool />
 }

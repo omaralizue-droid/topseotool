@@ -96,11 +96,24 @@ export const viewport: Viewport = {
   ],
 };
 
+import Script from "next/script";
+import { ADS_CONFIG } from "@/lib/ads-config";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {ADS_CONFIG.enableLiveAdsense && (
+          <Script
+            id="adsbygoogle-init"
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADS_CONFIG.adsenseClientId}`}
+          />
+        )}
+      </head>
       <body className="antialiased">
         <ThemeProvider
           attribute="class"
