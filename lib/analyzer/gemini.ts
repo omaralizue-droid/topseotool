@@ -3,16 +3,20 @@ import { GoogleGenAI } from "@google/genai"
 // Thin wrapper around the Gemini SDK with timeouts and two call styles:
 // structured JSON output, and free-text answers grounded in live Google Search.
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash"
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash"
 
 let client: GoogleGenAI | null = null
 
 export function aiEnabled(): boolean {
-  return !!process.env.GEMINI_API_KEY
+  const k = process.env.GEMINI_API_KEY
+  return typeof k === "string" && k.trim().length > 10 && k.trim() !== '""' && k.trim() !== "''"
 }
 
 function getClient(): GoogleGenAI {
-  if (!client) client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! })
+  if (!client) {
+    const rawKey = process.env.GEMINI_API_KEY?.trim().replace(/^["']|["']$/g, "")
+    client = new GoogleGenAI({ apiKey: rawKey })
+  }
   return client
 }
 

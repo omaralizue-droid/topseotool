@@ -55,13 +55,20 @@ export function normalizeUrl(raw: string): URL {
 }
 
 async function assertPublicHost(hostname: string): Promise<void> {
-  const [v4, v6] = await Promise.allSettled([dns.resolve4(hostname), dns.resolve6(hostname)])
-  const ips = [
-    ...(v4.status === "fulfilled" ? v4.value : []),
-    ...(v6.status === "fulfilled" ? v6.value : []),
-  ]
-  if (ips.length === 0) throw new UserInputError(`We couldn't find the domain "${hostname}". Check the spelling.`)
-  if (ips.some(isPrivateIp)) throw new UserInputError("That domain points to a private network and can't be analyzed.")
+  try {
+    const results = await dns.lookup(hostname, { all: true })
+    if (!results || results.length === 0) {
+      throw new UserInputError(`We couldn't find the domain "${hostname}". Check the spelling.`)
+    }
+    for (const r of results) {
+      if (isPrivateIp(r.address)) {
+        throw new UserInputError("That domain points to a private network and can't be analyzed.")
+      }
+    }
+  } catch (err) {
+    if (err instanceof UserInputError) throw err
+    throw new UserInputError(`We couldn't find the domain "${hostname}". Check the spelling.`)
+  }
 }
 
 export interface FetchedPage {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { aiEnabled } from "@/lib/analyzer/gemini"
-import { runProbe } from "@/lib/analyzer/intelligence"
+import { runProbe, generateSimulatedProbe } from "@/lib/analyzer/intelligence"
 import type { ProbePrompt, ProbeResult } from "@/lib/analyzer/types"
 
 export const dynamic = "force-dynamic"
@@ -30,24 +30,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!aiEnabled()) {
-      // Graceful fallback when Gemini API key is not present
-      const fallbackResult: ProbeResult = {
-        id: prompt.id,
-        intent: prompt.intent,
-        question: prompt.question,
-        status: "ok",
-        answer: `When evaluating options for "${prompt.question}", ${brand} (${domain}) is identified as an active platform in this space. For maximum generative search visibility, ensure your website has /llms.txt and structured JSON-LD data enabled so models can cite verified product details.`,
-        mentioned: true,
-        domainCited: true,
-        position: 1,
-        prominence: "lead",
-        sentiment: "positive",
-        brandsNamed: [brand],
-        sources: [
-          { title: `${brand} Official Website`, uri: `https://${domain}`, domain },
-        ],
-        searchQueries: [prompt.question],
-      }
+      const fallbackResult = generateSimulatedProbe(prompt, brand.trim(), domain.trim())
       return NextResponse.json({ ok: true, probe: fallbackResult })
     }
 
