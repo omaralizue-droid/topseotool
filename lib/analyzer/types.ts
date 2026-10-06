@@ -129,6 +129,24 @@ export interface ScanResponse {
   profile: BrandProfile
 }
 
+export interface PlatformScore {
+  id: "chatgpt" | "perplexity" | "gemini" | "claude" | "copilot" | "grok"
+  name: string
+  engine: string
+  model: string
+  scorePercent: number
+  accuracyPercent: number
+  rankLabel: string
+  rankPosition: number | null
+  status: "dominant" | "strong" | "moderate" | "unranked"
+  sentiment: "positive" | "neutral" | "mixed"
+  mentionRate: number
+  accentColor: string
+  badgeColor: string
+  icon: string
+  details: string
+}
+
 export interface ApiError {
   ok: false
   error: string
