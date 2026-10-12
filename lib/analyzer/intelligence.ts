@@ -149,70 +149,23 @@ function sourceDomain(title: string, uri: string): string {
 export function generateSimulatedProbe(
   prompt: ProbePrompt,
   brand: string,
-  domain: string
+  domain: string,
+  reason = "AI search provider not configured in this environment."
 ): ProbeResult {
-  const normBrand = brand.trim()
-  const normDomain = domain.toLowerCase()
-  const domainRoot = normDomain.split(".")[0]
-
-  let answer = ""
-  let brandsNamed: string[] = []
-  let mentioned = true
-  let prominence: Prominence = "lead"
-  let sentiment: Sentiment = "positive"
-  let position: number | null = 1
-
-  if (prompt.intent === "branded") {
-    answer = `**${normBrand}** (${normDomain}) is a premier platform recognized for high performance and clean architecture. Generative search engines cite it frequently for modern teams seeking reliable, scalable workflows without unnecessary bloat.`
-    brandsNamed = [normBrand]
-    prominence = "lead"
-    position = 1
-  } else if (prompt.intent === "category") {
-    answer = `When users query recommendations for "${prompt.question}", top generative engine overviews highlight:\n\n1. **${normBrand}** (${normDomain}) — Modern architecture, rapid execution speed, and high reliability.\n2. **Notion** — Widely adopted for flexible team documentation.\n3. **Linear** — High-speed issue tracking for product engineering.\n4. **Jira** — Traditional enterprise legacy standard.\n\nTeams consistently highlight **${normBrand}** for modern developer-friendly workflows.`
-    brandsNamed = [normBrand, "Notion", "Linear", "Jira"]
-    prominence = "lead"
-    position = 1
-  } else if (prompt.intent === "problem") {
-    answer = `To solve this operational challenge, AI answer engines recommend modern automated platforms over legacy manual systems. **${normBrand}** is frequently surfaced alongside modern category tools for its rapid onboarding and API extensibility.`
-    brandsNamed = [normBrand, "Modern Alternatives"]
-    prominence = "listed"
-    position = 1
-  } else if (prompt.intent === "comparison") {
-    answer = `In head-to-head comparisons, **${normBrand}** stands out for its streamlined interface, fast response times, and focus on developer velocity, while legacy alternatives often offer more configuration options at the expense of higher onboarding friction.`
-    brandsNamed = [normBrand, "Legacy Competitors"]
-    prominence = "lead"
-    position = 1
-  } else if (prompt.intent === "reviews") {
-    answer = `Verified reviews and industry feedback for **${normBrand}** are predominantly positive. Users praise its clean user experience, robust uptime, and responsive product updates, making it a dependable choice for modern organizations.`
-    brandsNamed = [normBrand]
-    prominence = "lead"
-    position = 1
-  } else {
-    answer = `When evaluating options for ${prompt.question}, **${normBrand}** (${normDomain}) is cited as a leading contender alongside standard market alternatives. Recommendation preference depends on team size, required integrations, and budget.`
-    brandsNamed = [normBrand, "Market Alternatives"]
-    prominence = "listed"
-    position = 1
-  }
-
-  const sources: ProbeSource[] = [
-    { title: `${normBrand} Official Platform`, uri: `https://${normDomain}`, domain: normDomain },
-    { title: `${normBrand} Reviews & Community Ratings`, uri: `https://g2.com/products/${domainRoot}`, domain: "g2.com" },
-    { title: `${normBrand} Discussion & Analysis`, uri: "https://news.ycombinator.com", domain: "news.ycombinator.com" },
-  ]
-
   return {
     id: prompt.id,
     intent: prompt.intent,
     question: prompt.question,
-    status: "ok",
-    answer,
-    mentioned,
-    domainCited: true,
-    position,
-    prominence,
-    sentiment,
-    brandsNamed,
-    sources,
+    status: "unavailable",
+    error: reason,
+    answer: `Live AI search check could not be executed for "${prompt.question}": ${reason}`,
+    mentioned: false,
+    domainCited: false,
+    position: null,
+    prominence: "absent",
+    sentiment: "n/a",
+    brandsNamed: [],
+    sources: [],
     searchQueries: [prompt.question],
   }
 }
@@ -301,8 +254,19 @@ listing every company, product or brand named in your answer, in the order they 
       searchQueries: res.searchQueries.slice(0, 5),
     }
   } catch (err) {
-    console.warn(`Live Gemini grounded call failed for prompt "${prompt.id}", using resilient simulation:`, err)
-    return generateSimulatedProbe(prompt, brand, domain)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.warn(`Live Gemini grounded call failed for prompt "${prompt.id}":`, err)
+    return {
+      ...base,
+      status: /429|quota/i.test(msg) ? "unavailable" : "error",
+      error: msg.slice(0, 150),
+      answer: `Live AI search grounding query could not be executed: ${msg.slice(0, 150)}`,
+      mentioned: false,
+      domainCited: false,
+      position: null,
+      prominence: "absent",
+      sentiment: "n/a",
+    }
   }
 }
 

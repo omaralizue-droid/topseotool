@@ -214,33 +214,93 @@ export default function ReportDetailPage() {
 
           <div className="space-y-3 pt-2">
             {providers.length > 0 ? (
-              providers.map((p: any, idx: number) => (
-                <div key={idx} className="p-4 rounded-lg bg-slate-950/50 border border-slate-800/80 print:bg-neutral-50 print:border-neutral-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-white print:text-black uppercase tracking-wider">{p.provider || p.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded font-medium ${
-                      p.mentioned ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400'
-                    }`}>
-                      {p.mentioned ? 'Mention Confirmed' : 'No Direct Mention'}
-                    </span>
-                  </div>
-                  {p.citationUrl && (
-                    <div className="text-xs text-blue-400 truncate">
-                      Citation: <a href={p.citationUrl} target="_blank" rel="noreferrer" className="underline">{p.citationUrl}</a>
+              providers.map((p: any, idx: number) => {
+                const isNotConfigured = p.status === "not_configured";
+                const isFailed = p.status === "failed" || p.status === "error";
+                const isRateLimited = p.status === "rate_limited";
+                const isCompleted = p.status === "completed" || (!p.status && typeof p.mentioned === "boolean");
+
+                return (
+                  <div key={idx} className="p-4 rounded-lg bg-slate-950/50 border border-slate-800/80 print:bg-neutral-50 print:border-neutral-200 space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-white print:text-black uppercase tracking-wider">{p.provider || p.name}</span>
+                        {p.model && (
+                          <span className="text-[10px] text-slate-400 font-mono bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+                            {p.model}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {isCompleted && (
+                        <span className={`text-xs px-2 py-0.5 rounded font-medium ${
+                          p.mentioned ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400'
+                        }`}>
+                          {p.mentioned ? 'Mention Confirmed' : 'No Direct Mention'}
+                        </span>
+                      )}
+                      {isNotConfigured && (
+                        <span className="text-xs px-2 py-0.5 rounded font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          API Not Configured
+                        </span>
+                      )}
+                      {isRateLimited && (
+                        <span className="text-xs px-2 py-0.5 rounded font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          Rate Limited (429)
+                        </span>
+                      )}
+                      {isFailed && (
+                        <span className="text-xs px-2 py-0.5 rounded font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                          Check Unavailable
+                        </span>
+                      )}
                     </div>
-                  )}
-                  {p.snippet && (
-                    <p className="text-xs text-slate-300 print:text-neutral-700 bg-slate-900/80 p-2.5 rounded border border-slate-800/50 font-mono">
-                      &ldquo;{p.snippet}&rdquo;
-                    </p>
-                  )}
-                </div>
-              ))
+
+                    {p.query && (
+                      <div className="text-[11px] text-slate-400 font-mono">
+                        Query tested: &ldquo;{p.query}&rdquo;
+                      </div>
+                    )}
+
+                    {p.citationUrls && p.citationUrls.length > 0 ? (
+                      <div className="text-xs text-blue-400 space-y-1">
+                        <span className="text-slate-400 text-[11px] block">Verified Citations:</span>
+                        {p.citationUrls.map((url: string, cIdx: number) => (
+                          <div key={cIdx} className="truncate">
+                            <a href={url} target="_blank" rel="noreferrer" className="underline hover:text-blue-300">
+                              {url}
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    ) : p.citationUrl ? (
+                      <div className="text-xs text-blue-400 truncate">
+                        Citation: <a href={p.citationUrl} target="_blank" rel="noreferrer" className="underline hover:text-blue-300">{p.citationUrl}</a>
+                      </div>
+                    ) : null}
+
+                    {p.snippet && (
+                      <p className="text-xs text-slate-300 print:text-neutral-700 bg-slate-900/80 p-2.5 rounded border border-slate-800/50 font-mono">
+                        &ldquo;{p.snippet}&rdquo;
+                      </p>
+                    )}
+
+                    {p.error && (
+                      <p className="text-xs text-slate-400 bg-slate-900/50 p-2 rounded border border-slate-800/60 font-mono">
+                        {p.error}
+                      </p>
+                    )}
+                  </div>
+                );
+              })
             ) : (
               <div className="p-4 rounded-lg bg-slate-950/50 border border-slate-800 text-sm text-slate-400">
                 Detailed provider evidence recorded during technical audit.
               </div>
             )}
+            <p className="text-[11px] text-slate-500 italic pt-2">
+              Note: Provider evidence captures API search grounding at scan timestamp. End-user consumer chat experiences may vary with conversational personalization and geographic routing.
+            </p>
           </div>
         </div>
 

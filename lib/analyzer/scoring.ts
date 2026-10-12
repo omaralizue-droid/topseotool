@@ -192,34 +192,24 @@ export function computePlatformScores(
   const getBotStatus = (botId: string) =>
     site.bots.find((b) => b.id.toLowerCase() === botId.toLowerCase())?.status ?? "allowed"
 
-  // 1. ChatGPT
-  const gptBot = getBotStatus("OAI-SearchBot") === "blocked" || getBotStatus("GPTBot") === "blocked" ? -18 : 0
-  const gptScore = Math.max(35, Math.min(99, Math.round(overallVal * 0.96 + (site.title ? 4 : 0) + gptBot)))
-  const gptAccuracy = Math.max(70, Math.min(99, Math.round(88 + (site.description ? 6 : 0) + (site.h1.length === 1 ? 4 : 0))))
+  const hasLiveProbes = okProbes.length > 0
 
-  // 2. Perplexity
-  const perpBot = getBotStatus("PerplexityBot") === "blocked" ? -25 : 0
-  const perpScore = Math.max(35, Math.min(99, Math.round(overallVal * 0.93 + (site.llmsTxtFound ? 8 : 0) + perpBot)))
-  const perpAccuracy = Math.max(68, Math.min(98, Math.round(85 + (okProbes.some((p) => p.domainCited) ? 9 : 0) + (site.llmsTxtFound ? 4 : 0))))
-
-  // 3. Gemini
+  // 1. Google Gemini (Live Search Grounded Engine)
   const gemBot = getBotStatus("Google-Extended") === "blocked" || getBotStatus("Googlebot") === "blocked" ? -20 : 0
-  const gemScore = Math.max(35, Math.min(99, Math.round(overallVal * 0.91 + (site.schemaTypes.length > 0 ? 8 : -4) + gemBot)))
-  const gemAccuracy = Math.max(65, Math.min(99, Math.round(82 + (site.schemaTypes.length > 0 ? 12 : 0) + (site.sitemapFound ? 4 : 0))))
+  const gemScore = hasLiveProbes
+    ? Math.max(0, Math.min(100, Math.round(baseMentionRate * 0.7 + (site.schemaTypes.length > 0 ? 20 : 5) + (okProbes.some((p) => p.domainCited) ? 10 : 0))))
+    : 0
+  const gemAccuracy = hasLiveProbes
+    ? Math.max(60, Math.min(99, Math.round(75 + (site.schemaTypes.length > 0 ? 15 : 0) + (okProbes.some((p) => p.domainCited) ? 10 : 0))))
+    : 0
 
-  // 4. Claude
-  const claudeBot = getBotStatus("ClaudeBot") === "blocked" || getBotStatus("Claude-SearchBot") === "blocked" ? -18 : 0
-  const claudeScore = Math.max(35, Math.min(99, Math.round(overallVal * 0.89 + (site.wordCount >= 400 ? 6 : -4) + claudeBot)))
-  const claudeAccuracy = Math.max(72, Math.min(99, Math.round(89 + (site.wordCount >= 400 ? 7 : 0))))
+  // 2. Other Engines (Crawler Technical Readiness Signals)
+  const gptBlocked = getBotStatus("OAI-SearchBot") === "blocked" || getBotStatus("GPTBot") === "blocked"
+  const perpBlocked = getBotStatus("PerplexityBot") === "blocked"
+  const claudeBlocked = getBotStatus("ClaudeBot") === "blocked" || getBotStatus("Claude-SearchBot") === "blocked"
+  const bingBlocked = getBotStatus("Bingbot") === "blocked"
 
-  // 5. Copilot
-  const bingBot = getBotStatus("Bingbot") === "blocked" ? -22 : 0
-  const copilotScore = Math.max(35, Math.min(99, Math.round(overallVal * 0.88 + (site.https ? 5 : -10) + bingBot)))
-  const copilotAccuracy = Math.max(70, Math.min(97, Math.round(86 + (site.https ? 6 : 0) + (site.sitemapFound ? 4 : 0))))
-
-  // 6. Grok
-  const grokScore = Math.max(35, Math.min(99, Math.round(overallVal * 0.85 + (baseMentionRate >= 50 ? 6 : 0))))
-  const grokAccuracy = Math.max(65, Math.min(96, Math.round(80 + (baseMentionRate >= 50 ? 10 : 0))))
+  const readinessBase = Math.round(overallVal * 0.8)
 
   const getRankInfo = (score: number) => {
     if (score >= 88) return { label: "#1 Lead Pick", pos: 1, status: "dominant" as const }
@@ -231,106 +221,108 @@ export function computePlatformScores(
 
   return [
     {
+      id: "gemini",
+      name: "Google Gemini",
+      engine: "Google Search Grounding",
+      model: "Gemini 2.0 Flash",
+      scorePercent: gemScore,
+      accuracyPercent: gemAccuracy,
+      rankLabel: hasLiveProbes ? getRankInfo(gemScore).label : "API Not Configured",
+      rankPosition: hasLiveProbes ? getRankInfo(gemScore).pos : null,
+      status: hasLiveProbes ? getRankInfo(gemScore).status : "unranked",
+      sentiment: gemScore >= 75 ? "positive" : gemScore >= 50 ? "neutral" : "mixed",
+      mentionRate: hasLiveProbes ? baseMentionRate : 0,
+      accentColor: "#2563eb",
+      badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
+      icon: "◈",
+      details: hasLiveProbes
+        ? "Verified via live Google Search Grounding"
+        : "Gemini API key not configured in this environment",
+    },
+    {
       id: "chatgpt",
       name: "ChatGPT",
       engine: "OpenAI SearchGPT",
-      model: "GPT-4o Engine",
-      scorePercent: gptScore,
-      accuracyPercent: gptAccuracy,
-      rankLabel: getRankInfo(gptScore).label,
-      rankPosition: getRankInfo(gptScore).pos,
-      status: getRankInfo(gptScore).status,
-      sentiment: gptScore >= 75 ? "positive" : gptScore >= 55 ? "neutral" : "mixed",
-      mentionRate: Math.min(100, Math.round(gptScore * 0.98)),
+      model: "Crawler Signal",
+      scorePercent: gptBlocked ? 20 : Math.max(40, readinessBase),
+      accuracyPercent: site.description ? 85 : 70,
+      rankLabel: gptBlocked ? "Crawler Blocked" : "Crawler Ready",
+      rankPosition: gptBlocked ? null : 3,
+      status: gptBlocked ? "unranked" : "moderate",
+      sentiment: gptBlocked ? "mixed" : "neutral",
+      mentionRate: gptBlocked ? 0 : Math.round(readinessBase * 0.9),
       accentColor: "#10a37f",
       badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
       icon: "✦",
-      details: getBotStatus("OAI-SearchBot") === "blocked" ? "OAI-SearchBot blocked in robots.txt" : "Live SearchGPT crawl access verified",
+      details: gptBlocked ? "OAI-SearchBot blocked in robots.txt" : "OAI-SearchBot allowed (Crawler readiness index)",
     },
     {
       id: "perplexity",
       name: "Perplexity AI",
-      engine: "Sonar Pro Search",
-      model: "Sonar Grounding",
-      scorePercent: perpScore,
-      accuracyPercent: perpAccuracy,
-      rankLabel: getRankInfo(perpScore).label,
-      rankPosition: getRankInfo(perpScore).pos,
-      status: getRankInfo(perpScore).status,
-      sentiment: perpScore >= 75 ? "positive" : perpScore >= 55 ? "neutral" : "mixed",
-      mentionRate: Math.min(100, Math.round(perpScore * 0.96)),
+      engine: "Sonar Search",
+      model: "Crawler Signal",
+      scorePercent: perpBlocked ? 15 : Math.max(40, Math.round(readinessBase + (site.llmsTxtFound ? 8 : 0))),
+      accuracyPercent: site.llmsTxtFound ? 90 : 75,
+      rankLabel: perpBlocked ? "Crawler Blocked" : "Crawler Ready",
+      rankPosition: perpBlocked ? null : 3,
+      status: perpBlocked ? "unranked" : "moderate",
+      sentiment: perpBlocked ? "mixed" : "neutral",
+      mentionRate: perpBlocked ? 0 : Math.round(readinessBase * 0.88),
       accentColor: "#6366f1",
       badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
       icon: "⊕",
-      details: site.llmsTxtFound ? "llms.txt context specification active" : "Web sources & domain citations grounded",
-    },
-    {
-      id: "gemini",
-      name: "Google Gemini",
-      engine: "Google Knowledge Graph",
-      model: "Gemini 2.0 Pro",
-      scorePercent: gemScore,
-      accuracyPercent: gemAccuracy,
-      rankLabel: getRankInfo(gemScore).label,
-      rankPosition: getRankInfo(gemScore).pos,
-      status: getRankInfo(gemScore).status,
-      sentiment: gemScore >= 75 ? "positive" : gemScore >= 55 ? "neutral" : "mixed",
-      mentionRate: Math.min(100, Math.round(gemScore * 0.94)),
-      accentColor: "#2563eb",
-      badgeColor: "bg-blue-50 text-blue-700 border-blue-200",
-      icon: "◈",
-      details: site.schemaTypes.length > 0 ? "Schema.org entity data verified" : "Recommend Schema.org JSON-LD to ground entity",
+      details: perpBlocked ? "PerplexityBot blocked in robots.txt" : "PerplexityBot allowed (Crawler readiness index)",
     },
     {
       id: "claude",
       name: "Anthropic Claude",
-      engine: "Claude 3.5 Sonnet",
-      model: "Sonnet Evaluation",
-      scorePercent: claudeScore,
-      accuracyPercent: claudeAccuracy,
-      rankLabel: getRankInfo(claudeScore).label,
-      rankPosition: getRankInfo(claudeScore).pos,
-      status: getRankInfo(claudeScore).status,
-      sentiment: claudeScore >= 75 ? "positive" : claudeScore >= 55 ? "neutral" : "mixed",
-      mentionRate: Math.min(100, Math.round(claudeScore * 0.92)),
+      engine: "Claude Search",
+      model: "Crawler Signal",
+      scorePercent: claudeBlocked ? 20 : Math.max(40, Math.round(readinessBase + (site.wordCount >= 400 ? 5 : 0))),
+      accuracyPercent: site.wordCount >= 400 ? 88 : 72,
+      rankLabel: claudeBlocked ? "Crawler Blocked" : "Crawler Ready",
+      rankPosition: claudeBlocked ? null : 4,
+      status: claudeBlocked ? "unranked" : "moderate",
+      sentiment: claudeBlocked ? "mixed" : "neutral",
+      mentionRate: claudeBlocked ? 0 : Math.round(readinessBase * 0.85),
       accentColor: "#d97706",
       badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
       icon: "◇",
-      details: site.wordCount >= 400 ? "In-depth server-rendered content found" : "Nuanced technical recommendation model",
+      details: claudeBlocked ? "ClaudeBot blocked in robots.txt" : "ClaudeBot allowed (Crawler readiness index)",
     },
     {
       id: "copilot",
       name: "Microsoft Copilot",
       engine: "Bing Search Index",
-      model: "Copilot GPT-4",
-      scorePercent: copilotScore,
-      accuracyPercent: copilotAccuracy,
-      rankLabel: getRankInfo(copilotScore).label,
-      rankPosition: getRankInfo(copilotScore).pos,
-      status: getRankInfo(copilotScore).status,
-      sentiment: copilotScore >= 75 ? "positive" : copilotScore >= 55 ? "neutral" : "mixed",
-      mentionRate: Math.min(100, Math.round(copilotScore * 0.9)),
+      model: "Crawler Signal",
+      scorePercent: bingBlocked ? 10 : Math.max(35, Math.round(readinessBase + (site.https ? 6 : -10))),
+      accuracyPercent: site.https ? 85 : 65,
+      rankLabel: bingBlocked ? "Crawler Blocked" : "Crawler Ready",
+      rankPosition: bingBlocked ? null : 4,
+      status: bingBlocked ? "unranked" : "moderate",
+      sentiment: bingBlocked ? "mixed" : "neutral",
+      mentionRate: bingBlocked ? 0 : Math.round(readinessBase * 0.8),
       accentColor: "#0284c7",
       badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
       icon: "⬡",
-      details: site.https ? "HTTPS security & enterprise credibility" : "Requires HTTPS to qualify for enterprise index",
+      details: bingBlocked ? "Bingbot blocked in robots.txt" : "Bingbot allowed (Crawler readiness index)",
     },
     {
       id: "grok",
       name: "xAI Grok",
-      engine: "Grok-2 Real-Time",
-      model: "xAI Grounding",
-      scorePercent: grokScore,
-      accuracyPercent: grokAccuracy,
-      rankLabel: getRankInfo(grokScore).label,
-      rankPosition: getRankInfo(grokScore).pos,
-      status: getRankInfo(grokScore).status,
-      sentiment: grokScore >= 75 ? "positive" : grokScore >= 55 ? "neutral" : "mixed",
-      mentionRate: Math.min(100, Math.round(grokScore * 0.88)),
+      engine: "xAI Grounding",
+      model: "Crawler Signal",
+      scorePercent: Math.max(30, Math.round(readinessBase * 0.8)),
+      accuracyPercent: 75,
+      rankLabel: "Crawler Signal",
+      rankPosition: null,
+      status: "unranked",
+      sentiment: "neutral",
+      mentionRate: Math.round(readinessBase * 0.75),
       accentColor: "#9333ea",
       badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
       icon: "⟡",
-      details: "Real-time industry sentiment & developer mentions",
+      details: "Real-time crawler access and web readiness signal",
     },
   ]
 }
