@@ -61,7 +61,7 @@ export async function GET() {
       providers: {
         total: providers.length,
         healthy: operationalProviders,
-        withErrors: providers.filter((p) => p.status === "error").length,
+        withErrors: providers.filter((p) => p.status === "degraded" || p.status === "offline").length,
       },
       providersList: providers,
       recentAuditLogs: auditLogs,

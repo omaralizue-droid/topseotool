@@ -290,6 +290,14 @@ export async function updateReport(id: string, updates: Partial<ReportRecord>): 
   return db.reports[idx]
 }
 
+export async function deleteReport(id: string): Promise<boolean> {
+  const db = getDb()
+  const initialLen = db.reports.length
+  db.reports = db.reports.filter((r) => r.id !== id)
+  saveDb(db)
+  return db.reports.length < initialLen
+}
+
 // ─────────────────────────────────────────────────────────────
 // COMPETITORS REPOSITORY
 // ─────────────────────────────────────────────────────────────

@@ -105,6 +105,33 @@
       "currentPeriodEnd": "2026-11-11T20:04:53.432Z",
       "createdAt": "2026-10-12T20:04:53.432Z",
       "updatedAt": "2026-10-12T20:04:53.432Z"
+    },
+    {
+      "id": "sub_ff3eb5cbb0441437",
+      "userId": "usr_dae1aedb9d643206",
+      "plan": "free",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-11T20:26:43.228Z",
+      "createdAt": "2026-10-12T20:26:43.224Z",
+      "updatedAt": "2026-10-12T20:26:43.224Z"
+    },
+    {
+      "id": "sub_3689f67f897f7b85",
+      "userId": "usr_9e1346ad4afb6f80",
+      "plan": "free",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-11T20:26:43.511Z",
+      "createdAt": "2026-10-12T20:26:43.511Z",
+      "updatedAt": "2026-10-12T20:26:43.511Z"
+    },
+    {
+      "id": "sub_db58b782cff418a2",
+      "userId": "usr_cdfb5aa3ded57598",
+      "plan": "free",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-11T20:26:52.922Z",
+      "createdAt": "2026-10-12T20:26:52.922Z",
+      "updatedAt": "2026-10-12T20:26:52.922Z"
     }
   ],
   "providers": [
@@ -196,6 +223,39 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "log_d2108a3fbaa40e01",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "user.modify",
+      "targetType": "user",
+      "targetId": "usr_cdfb5aa3ded57598",
+      "details": "Admin admin@topseotool.net updated testuser_1791836812732@topseotool.net: ",
+      "status": "success",
+      "timestamp": "2026-10-12T20:26:55.278Z"
+    },
+    {
+      "id": "log_f37b50715afc19df",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "auth.login_admin",
+      "targetType": "user",
+      "targetId": "usr_admin_001",
+      "details": "Administrator logged in to console",
+      "status": "success",
+      "timestamp": "2026-10-12T20:26:53.692Z"
+    },
+    {
+      "id": "log_19c0ee21a72dcf9b",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "auth.login_admin",
+      "targetType": "user",
+      "targetId": "usr_admin_001",
+      "details": "Administrator logged in to console",
+      "status": "success",
+      "timestamp": "2026-10-12T20:15:27.109Z"
+    },
     {
       "id": "log_a72f4e4451c94f8f",
       "actorId": "usr_admin_001",

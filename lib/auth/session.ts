@@ -5,7 +5,7 @@ import type { User, UserRole, PlanTier } from "@/lib/db/types"
 
 const COOKIE_NAME = "topseotool_session"
 const SECRET_KEY = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "topseotool-enterprise-secret-key-min-32-chars-long!"
+  process.env.AUTH_SECRET || process.env.JWT_SECRET || "topseotool-enterprise-secret-key-min-32-chars-long!"
 )
 
 export interface SessionPayload {

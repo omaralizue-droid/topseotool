@@ -46,6 +46,7 @@ export interface ScanRecord {
   mentionsCount: number
   startedAt: string
   completedAt?: string
+  reportId?: string
   error?: string
 }
 
