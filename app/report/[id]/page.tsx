@@ -17,26 +17,28 @@ export default function ReportDetailPage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchReport();
-    }
-  }, [id]);
-
-  async function fetchReport() {
-    try {
-      const res = await fetch(`/api/reports/${id}`);
-      if (!res.ok) {
-        setError('Report not found or private');
-        return;
+    let ignore = false;
+    async function init() {
+      if (!id) return;
+      try {
+        const res = await fetch(`/api/reports/${id}`);
+        if (!res.ok) {
+          if (!ignore) setError('Report not found or private');
+          return;
+        }
+        const data = await res.json();
+        if (!ignore) setReport(data.report);
+      } catch (err: any) {
+        if (!ignore) setError(err.message || 'Failed to load report');
+      } finally {
+        if (!ignore) setLoading(false);
       }
-      const data = await res.json();
-      setReport(data.report);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load report');
-    } finally {
-      setLoading(false);
     }
-  }
+    init();
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
 
   function handlePrint() {
     window.print();
@@ -229,7 +231,7 @@ export default function ReportDetailPage() {
                   )}
                   {p.snippet && (
                     <p className="text-xs text-slate-300 print:text-neutral-700 bg-slate-900/80 p-2.5 rounded border border-slate-800/50 font-mono">
-                      "{p.snippet}"
+                      &ldquo;{p.snippet}&rdquo;
                     </p>
                   )}
                 </div>

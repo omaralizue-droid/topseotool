@@ -20,22 +20,25 @@ export default function AdminSettingsPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  async function fetchSettings() {
-    try {
-      const res = await fetch('/api/admin/settings');
-      const data = await res.json();
-      if (data.settings) {
-        setSettings(data.settings);
+    let ignore = false;
+    async function initSettings() {
+      try {
+        const res = await fetch('/api/admin/settings');
+        const data = await res.json();
+        if (!ignore && data.settings) {
+          setSettings(data.settings);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (!ignore) setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
-  }
+    initSettings();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();

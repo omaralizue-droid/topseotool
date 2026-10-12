@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { Globe, Plus, Trash2, ShieldCheck, RefreshCw, X, ExternalLink } from "lucide-react"
 import type { Website } from "@/lib/db/types"
@@ -14,7 +14,7 @@ export default function WebsitesPage() {
   const [error, setError] = useState<string | null>(null)
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
 
-  const loadWebsites = async () => {
+  const loadWebsites = useCallback(async () => {
     try {
       const res = await fetch("/api/websites")
       const data = await res.json()
@@ -26,10 +26,27 @@ export default function WebsitesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    loadWebsites()
+    let ignore = false
+    async function init() {
+      try {
+        const res = await fetch("/api/websites")
+        const data = await res.json()
+        if (!ignore && res.ok && data.ok) {
+          setWebsites(data.websites)
+        }
+      } catch {
+        /* ignore */
+      } finally {
+        if (!ignore) setIsLoading(false)
+      }
+    }
+    init()
+    return () => {
+      ignore = true
+    }
   }, [])
 
   const handleAdd = async (e: React.FormEvent) => {

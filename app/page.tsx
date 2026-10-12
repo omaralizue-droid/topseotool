@@ -95,21 +95,30 @@ export default function HomePage() {
 
   // Load saved audits from localStorage on mount & handle query params
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        setSavedAudits(JSON.parse(stored))
+    let ignore = false
+    const timer = setTimeout(() => {
+      if (ignore) return
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
+          setSavedAudits(JSON.parse(stored))
+        }
+      } catch {
+        /* ignore storage read error */
       }
-    } catch {
-      /* ignore storage read error */
-    }
 
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search)
-      const domainParam = params.get("domain") || params.get("url")
-      const brandParam = params.get("brand")
-      if (domainParam) setUrlInput(domainParam)
-      if (brandParam) setBrandInput(brandParam)
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search)
+        const domainParam = params.get("domain") || params.get("url")
+        const brandParam = params.get("brand")
+        if (domainParam) setUrlInput(domainParam)
+        if (brandParam) setBrandInput(brandParam)
+      }
+    }, 0)
+
+    return () => {
+      ignore = true
+      clearTimeout(timer)
     }
   }, [])
 
@@ -421,7 +430,7 @@ export default function HomePage() {
     site && profile && report
       ? {
           id: `${site.domain}-active`,
-          timestamp: Date.now(),
+          timestamp: 0,
           brand: profile.brand,
           url: urlInput,
           domain: site.domain,

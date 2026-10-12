@@ -28,22 +28,25 @@ export default function ReportsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
-    fetchReports();
-  }, []);
-
-  async function fetchReports() {
-    try {
-      const res = await fetch('/api/reports');
-      const data = await res.json();
-      if (data.reports) {
-        setReports(data.reports);
+    let ignore = false;
+    async function load() {
+      try {
+        const res = await fetch('/api/reports');
+        const data = await res.json();
+        if (!ignore && data.reports) {
+          setReports(data.reports);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (!ignore) setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
-  }
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const filtered = reports.filter(r => {
     const matchesSearch = r.domain.toLowerCase().includes(search.toLowerCase()) || 

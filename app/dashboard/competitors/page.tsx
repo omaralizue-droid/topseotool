@@ -35,35 +35,33 @@ export default function CompetitorsPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    try {
-      const [compRes, webRes] = await fetchAll();
-      if (webRes && webRes.websites) {
-        setWebsites(webRes.websites);
-        if (webRes.websites.length > 0 && !selectedWebsiteId) {
-          setSelectedWebsiteId('all');
+    let ignore = false;
+    async function load() {
+      try {
+        const [compRes, webRes] = await Promise.all([
+          fetch('/api/competitors').then(r => r.json()),
+          fetch('/api/websites').then(r => r.json()),
+        ]);
+        if (!ignore) {
+          if (webRes && webRes.websites) {
+            setWebsites(webRes.websites);
+            setSelectedWebsiteId(prev => (webRes.websites.length > 0 && !prev ? 'all' : prev));
+          }
+          if (compRes && compRes.competitors) {
+            setCompetitors(compRes.competitors);
+          }
         }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (!ignore) setLoading(false);
       }
-      if (compRes && compRes.competitors) {
-        setCompetitors(compRes.competitors);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
-  }
-
-  async function fetchAll() {
-    const [compRes, webRes] = await Promise.all([
-      fetch('/api/competitors').then(r => r.json()),
-      fetch('/api/websites').then(r => r.json()),
-    ]);
-    return [compRes, webRes];
-  }
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   async function handleAddCompetitor(e: React.FormEvent) {
     e.preventDefault();
@@ -89,7 +87,9 @@ export default function CompetitorsPage() {
       setIsAdding(false);
       setNewDomain('');
       setNewBrandName('');
-      await loadData();
+      if (data.competitor) {
+        setCompetitors(prev => [data.competitor, ...prev]);
+      }
     } catch (err: any) {
       setActionError(err.message);
     } finally {
