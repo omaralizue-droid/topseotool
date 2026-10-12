@@ -334,3 +334,90 @@ export function computePlatformScores(
     },
   ]
 }
+
+export interface CompetitorComparisonItem {
+  brand: string
+  isTarget: boolean
+  mentionCount: number
+  mentionPercent: number
+  prominence: "lead" | "listed" | "passing" | "absent"
+  sentiment: "positive" | "neutral" | "mixed" | "n/a"
+}
+
+export function compareCompetitors(
+  probes: ProbeResult[],
+  targetBrand: string,
+  extraCompetitors: string[] = []
+): CompetitorComparisonItem[] {
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "")
+  const okProbes = probes.filter((p) => p.status === "ok")
+  const total = okProbes.length || 1
+
+  const allNames = new Set<string>()
+  allNames.add(targetBrand)
+  for (const c of extraCompetitors) {
+    if (c.trim()) allNames.add(c.trim())
+  }
+  // Also collect top competitors discovered in probe answers
+  for (const p of okProbes) {
+    for (const b of p.brandsNamed) {
+      if (b.trim() && allNames.size < 7) allNames.add(b.trim())
+    }
+  }
+
+  const results: CompetitorComparisonItem[] = []
+
+  for (const name of allNames) {
+    const k = norm(name)
+    if (!k) continue
+    const isTarget = k === norm(targetBrand)
+
+    let mentionCount = 0
+    let leadCount = 0
+    let posSentiment = 0
+    let negSentiment = 0
+
+    for (const p of okProbes) {
+      const match =
+        p.brandsNamed.some((b) => norm(b) === k || norm(b).includes(k) || k.includes(norm(b))) ||
+        (isTarget && p.mentioned) ||
+        norm(p.answer).includes(k)
+
+      if (match) {
+        mentionCount++
+        if (p.position === 1 || (isTarget && p.prominence === "lead")) leadCount++
+        if (p.sentiment === "positive") posSentiment++
+        if (p.sentiment === "negative") negSentiment++
+      }
+    }
+
+    const prominence =
+      mentionCount === 0
+        ? "absent"
+        : leadCount >= 1
+        ? "lead"
+        : mentionCount >= 2
+        ? "listed"
+        : "passing"
+
+    const sentiment =
+      mentionCount === 0
+        ? "n/a"
+        : posSentiment > negSentiment
+        ? "positive"
+        : negSentiment > posSentiment
+        ? "mixed"
+        : "neutral"
+
+    results.push({
+      brand: name,
+      isTarget,
+      mentionCount,
+      mentionPercent: Math.round((mentionCount / total) * 100),
+      prominence,
+      sentiment,
+    })
+  }
+
+  return results.sort((a, b) => (b.isTarget ? -1 : a.isTarget ? 1 : b.mentionCount - a.mentionCount))
+}

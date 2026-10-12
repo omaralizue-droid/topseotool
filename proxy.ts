@@ -13,8 +13,36 @@ const PROBE_PATHS = [
   /^\/cgi-bin/i,
 ]
 
+// In-memory sliding window rate limiter
+const ipRequestCounts = new Map<string, { count: number; resetAt: number }>()
+
+function isRateLimited(ip: string, limit = 60, windowMs = 60_000): boolean {
+  const now = Date.now()
+  const entry = ipRequestCounts.get(ip)
+
+  if (!entry || now > entry.resetAt) {
+    ipRequestCounts.set(ip, { count: 1, resetAt: now + windowMs })
+    return false
+  }
+
+  entry.count++
+  if (entry.count > limit) {
+    return true
+  }
+
+  // Periodic cleanup to avoid memory leak
+  if (ipRequestCounts.size > 2000) {
+    for (const [k, v] of ipRequestCounts.entries()) {
+      if (now > v.resetAt) ipRequestCounts.delete(k)
+    }
+  }
+
+  return false
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous"
 
   // 1. Block malicious scanner probes
   for (const pattern of PROBE_PATHS) {
@@ -23,10 +51,20 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 2. Proceed with request
+  // 2. Rate limit API routes (30 requests / minute)
+  if (pathname.startsWith("/api/analyze/")) {
+    if (isRateLimited(ip, 30, 60_000)) {
+      return NextResponse.json(
+        { ok: false, error: "Rate limit exceeded. Please wait a minute before making more scan requests." },
+        { status: 429, headers: { "Retry-After": "60" } }
+      )
+    }
+  }
+
+  // 3. Proceed with request
   const response = NextResponse.next()
 
-  // 3. Apply standard security headers
+  // 4. Apply standard security headers
   response.headers.set("X-Content-Type-Options", "nosniff")
   response.headers.set("X-Frame-Options", "DENY")
   response.headers.set("X-XSS-Protection", "1; mode=block")

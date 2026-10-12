@@ -147,6 +147,31 @@ export interface PlatformScore {
   details: string
 }
 
+export interface CompetitorResult {
+  brand: string
+  domain: string
+  shareCount: number
+  sentiment: Sentiment
+  prominence: Prominence
+}
+
+export interface SavedAudit {
+  id: string
+  timestamp: number
+  brand: string
+  url: string
+  domain: string
+  overallScore: number
+  readinessScore: number
+  visibilityScore: number | null
+  tierLabel: string
+  site: SiteSnapshot
+  checks: ReadinessCheck[]
+  profile: BrandProfile
+  probes: ProbeResult[]
+  report: AiReport
+}
+
 export interface ApiError {
   ok: false
   error: string
