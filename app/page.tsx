@@ -354,6 +354,39 @@ export default function HomePage() {
       }
       saveAuditRecord(savedRecord)
 
+      // Sync to enterprise backend if signed in
+      try {
+        fetch('/api/reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            domain: scannedSite.domain,
+            brandName: scannedProfile.brand,
+            overallScore: oScore,
+            readinessScore: rScore,
+            mentionRate: vBreakdown ? Math.round(vBreakdown.recognitionRate * 100) : 0,
+            citationsCount: collectedProbes.reduce((acc, p) => acc + (p.sources?.length || 0), 0),
+            payload: {
+              readiness: {
+                statusCode: scannedSite.statusCode || 200,
+                robotsTxtAllowed: scannedChecks.some(c => c.id === 'robots-txt' && c.status === 'pass'),
+                hasJsonLd: scannedChecks.some(c => c.id === 'json-ld' && c.status === 'pass'),
+                hasOpenGraph: scannedChecks.some(c => c.id === 'open-graph' && c.status === 'pass'),
+              },
+              providers: collectedProbes.map(p => ({
+                provider: p.intent,
+                mentioned: p.mentioned,
+                citationUrl: p.sources?.[0]?.uri,
+                snippet: p.answer?.slice(0, 200),
+              })),
+              report: generatedReport,
+            }
+          })
+        }).catch(() => {})
+      } catch {
+        /* guest fallback */
+      }
+
       setCurrentStep(4) // Complete
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Analysis failed."

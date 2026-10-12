@@ -1,7 +1,8 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Sparkles, History, CreditCard, Share2, Printer } from "lucide-react"
+import { Sparkles, History, CreditCard, Share2, Printer, LayoutDashboard, ShieldAlert, LogIn, User } from "lucide-react"
 
 interface NavbarProps {
   hasResults: boolean
@@ -11,6 +12,14 @@ interface NavbarProps {
   onOpenShare: () => void
 }
 
+interface CurrentUser {
+  id: string
+  email: string
+  name?: string
+  role: "customer" | "admin"
+  plan: string
+}
+
 export function Navbar({
   hasResults,
   savedCount,
@@ -18,9 +27,27 @@ export function Navbar({
   onOpenPricing,
   onOpenShare,
 }: NavbarProps) {
+  const [user, setUser] = useState<CurrentUser | null>(null)
+  const [loadingUser, setLoadingUser] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => {
+        if (res.ok) return res.json()
+        return null
+      })
+      .then((data) => {
+        if (data && data.user) {
+          setUser(data.user)
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingUser(false))
+  }, [])
+
   return (
     <header className="border-b border-neutral-200/80 bg-white/85 backdrop-blur-md sticky top-0 z-30 transition-all">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs group-hover:bg-blue-700 transition-colors">
@@ -77,11 +104,57 @@ export function Navbar({
           <button
             type="button"
             onClick={onOpenPricing}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white font-medium transition-colors cursor-pointer shadow-2xs"
+            className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 font-medium transition-colors cursor-pointer"
           >
-            <CreditCard className="w-3.5 h-3.5 text-blue-400" />
+            <CreditCard className="w-3.5 h-3.5 text-blue-600" />
             <span>Pricing</span>
           </button>
+
+          <div className="h-4 w-px bg-neutral-200 mx-1 hidden sm:block" />
+
+          {/* User Auth Buttons */}
+          {!loadingUser && (
+            <>
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors cursor-pointer shadow-xs"
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5" />
+                    <span>Dashboard</span>
+                  </Link>
+
+                  {user.role === "admin" && (
+                    <Link
+                      href="/admin"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold transition-colors cursor-pointer"
+                      title="Admin Panel"
+                    >
+                      <ShieldAlert className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Admin</span>
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 font-medium transition-colors cursor-pointer"
+                  >
+                    <LogIn className="w-3.5 h-3.5 text-neutral-500" />
+                    <span>Sign In</span>
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white font-medium transition-colors cursor-pointer shadow-2xs"
+                  >
+                    <span>Get Started</span>
+                  </Link>
+                </div>
+              )}
+            </>
+          )}
         </nav>
       </div>
     </header>

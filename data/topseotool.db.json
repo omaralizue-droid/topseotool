@@ -1,0 +1,288 @@
+{
+  "users": [
+    {
+      "id": "usr_admin_001",
+      "name": "System Administrator",
+      "email": "admin@topseotool.net",
+      "passwordHash": "$2a$10$PmsUBNUWzr1.PZWRnZ58B.ICy9JoAtAr2mzHeTXD8gz6b6d9JQUlG",
+      "role": "admin",
+      "status": "active",
+      "plan": "enterprise",
+      "scanCredits": 99999,
+      "totalScansRun": 0,
+      "createdAt": "2026-10-12T20:02:32.788Z",
+      "updatedAt": "2026-10-12T20:02:32.788Z"
+    },
+    {
+      "id": "usr_demo_002",
+      "name": "Sarah Jenkins",
+      "email": "customer@topseotool.net",
+      "passwordHash": "$2a$10$Qd2aAo.SXsMXLjBLvk10auizDv6SMZRF.DKpCR6VWGmEUdQRJbQfq",
+      "role": "customer",
+      "status": "active",
+      "plan": "pro",
+      "scanCredits": 85,
+      "totalScansRun": 15,
+      "createdAt": "2026-10-12T20:02:33.189Z",
+      "updatedAt": "2026-10-12T20:02:33.189Z"
+    }
+  ],
+  "websites": [
+    {
+      "id": "site_demo_1",
+      "userId": "usr_demo_002",
+      "domain": "linear.app",
+      "brandName": "Linear",
+      "verified": true,
+      "monitoringEnabled": true,
+      "monitoringFrequency": "weekly",
+      "createdAt": "2026-10-12T20:02:33.474Z",
+      "updatedAt": "2026-10-12T20:02:33.474Z"
+    }
+  ],
+  "scans": [],
+  "reports": [],
+  "competitors": [
+    {
+      "id": "comp_1",
+      "userId": "usr_demo_002",
+      "websiteId": "site_demo_1",
+      "domain": "jira.atlassian.com",
+      "brandName": "Jira",
+      "createdAt": "2026-10-12T20:02:33.474Z"
+    },
+    {
+      "id": "comp_2",
+      "userId": "usr_demo_002",
+      "websiteId": "site_demo_1",
+      "domain": "asana.com",
+      "brandName": "Asana",
+      "createdAt": "2026-10-12T20:02:33.474Z"
+    }
+  ],
+  "subscriptions": [
+    {
+      "id": "sub_demo_1",
+      "userId": "usr_demo_002",
+      "plan": "pro",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-11T20:02:33.474Z",
+      "createdAt": "2026-10-12T20:02:33.474Z",
+      "updatedAt": "2026-10-12T20:02:33.474Z"
+    },
+    {
+      "id": "sub_02ce8382a1c352e0",
+      "userId": "usr_61228ea0dd377696",
+      "plan": "free",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-11T20:03:11.244Z",
+      "createdAt": "2026-10-12T20:03:11.243Z",
+      "updatedAt": "2026-10-12T20:03:11.243Z"
+    },
+    {
+      "id": "sub_34957a32265914bf",
+      "userId": "usr_40984224abebe70c",
+      "plan": "free",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-11T20:03:39.922Z",
+      "createdAt": "2026-10-12T20:03:39.922Z",
+      "updatedAt": "2026-10-12T20:03:39.922Z"
+    },
+    {
+      "id": "sub_e8faf85e1dab94a9",
+      "userId": "usr_83e3d5a9c96b8595",
+      "plan": "free",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-11T20:04:32.201Z",
+      "createdAt": "2026-10-12T20:04:32.201Z",
+      "updatedAt": "2026-10-12T20:04:32.201Z"
+    },
+    {
+      "id": "sub_12637828e3caad70",
+      "userId": "usr_6a91f573a6a8d555",
+      "plan": "free",
+      "status": "active",
+      "currentPeriodEnd": "2026-11-11T20:04:53.432Z",
+      "createdAt": "2026-10-12T20:04:53.432Z",
+      "updatedAt": "2026-10-12T20:04:53.432Z"
+    }
+  ],
+  "providers": [
+    {
+      "id": "gemini",
+      "name": "Google Gemini 2.0 (Google Search Grounding)",
+      "enabled": true,
+      "hasApiKey": false,
+      "lastCheckedAt": "2026-10-12T20:02:33.475Z",
+      "status": "degraded"
+    },
+    {
+      "id": "openai",
+      "name": "OpenAI SearchGPT / GPT-4o",
+      "enabled": true,
+      "hasApiKey": false,
+      "lastCheckedAt": "2026-10-12T20:02:33.475Z",
+      "status": "degraded"
+    },
+    {
+      "id": "perplexity",
+      "name": "Perplexity AI Sonar Pro",
+      "enabled": true,
+      "hasApiKey": false,
+      "lastCheckedAt": "2026-10-12T20:02:33.475Z",
+      "status": "degraded"
+    },
+    {
+      "id": "claude",
+      "name": "Anthropic Claude 3.5 Sonnet",
+      "enabled": true,
+      "hasApiKey": false,
+      "lastCheckedAt": "2026-10-12T20:02:33.475Z",
+      "status": "degraded"
+    },
+    {
+      "id": "copilot",
+      "name": "Microsoft Copilot (Bing Search)",
+      "enabled": true,
+      "hasApiKey": false,
+      "lastCheckedAt": "2026-10-12T20:02:33.475Z",
+      "status": "operational"
+    },
+    {
+      "id": "grok",
+      "name": "xAI Grok-2 Real-Time",
+      "enabled": true,
+      "hasApiKey": false,
+      "lastCheckedAt": "2026-10-12T20:02:33.475Z",
+      "status": "operational"
+    }
+  ],
+  "settings": [
+    {
+      "key": "appName",
+      "value": "TOPSEOTOOL",
+      "updatedAt": "2026-10-12T20:02:33.475Z",
+      "updatedBy": "system"
+    },
+    {
+      "key": "freeScanLimitDaily",
+      "value": "3",
+      "updatedAt": "2026-10-12T20:02:33.475Z",
+      "updatedBy": "system"
+    },
+    {
+      "key": "maxScanTimeoutSeconds",
+      "value": "45",
+      "updatedAt": "2026-10-12T20:02:33.475Z",
+      "updatedBy": "system"
+    },
+    {
+      "key": "rateLimitPerMinute",
+      "value": "30",
+      "updatedAt": "2026-10-12T20:02:33.475Z",
+      "updatedBy": "system"
+    },
+    {
+      "key": "maintenanceMode",
+      "value": "false",
+      "updatedAt": "2026-10-12T20:02:33.475Z",
+      "updatedBy": "system"
+    },
+    {
+      "key": "defaultReportVisibility",
+      "value": "public_with_link",
+      "updatedAt": "2026-10-12T20:02:33.475Z",
+      "updatedBy": "system"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "log_a72f4e4451c94f8f",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "auth.login_admin",
+      "targetType": "user",
+      "targetId": "usr_admin_001",
+      "details": "Administrator logged in to console",
+      "status": "success",
+      "timestamp": "2026-10-12T20:06:29.139Z"
+    },
+    {
+      "id": "log_699e451ba85a0b3c",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "auth.login_admin",
+      "targetType": "user",
+      "targetId": "usr_admin_001",
+      "details": "Administrator logged in to console",
+      "status": "success",
+      "timestamp": "2026-10-12T20:05:54.810Z"
+    },
+    {
+      "id": "log_4de3ea1510d24a4b",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "user.modify",
+      "targetType": "user",
+      "targetId": "usr_6a91f573a6a8d555",
+      "details": "Admin admin@topseotool.net updated testuser_1791835493259@topseotool.net: ",
+      "status": "success",
+      "timestamp": "2026-10-12T20:04:57.380Z"
+    },
+    {
+      "id": "log_f3057727d6aff606",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "auth.login_admin",
+      "targetType": "user",
+      "targetId": "usr_admin_001",
+      "details": "Administrator logged in to console",
+      "status": "success",
+      "timestamp": "2026-10-12T20:04:54.030Z"
+    },
+    {
+      "id": "log_2a5178b98d50981a",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "auth.login_admin",
+      "targetType": "user",
+      "targetId": "usr_admin_001",
+      "details": "Administrator logged in to console",
+      "status": "success",
+      "timestamp": "2026-10-12T20:04:32.773Z"
+    },
+    {
+      "id": "log_55d42bb20aa1ba84",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "auth.login_admin",
+      "targetType": "user",
+      "targetId": "usr_admin_001",
+      "details": "Administrator logged in to console",
+      "status": "success",
+      "timestamp": "2026-10-12T20:03:40.871Z"
+    },
+    {
+      "id": "log_4d928b31c11bff98",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "auth.login_admin",
+      "targetType": "user",
+      "targetId": "usr_admin_001",
+      "details": "Administrator logged in to console",
+      "status": "success",
+      "timestamp": "2026-10-12T20:03:16.299Z"
+    },
+    {
+      "id": "log_init_001",
+      "actorId": "usr_admin_001",
+      "actorEmail": "admin@topseotool.net",
+      "action": "system.bootstrap",
+      "targetType": "settings",
+      "targetId": "global",
+      "details": "TopSEOTool enterprise platform database initialized with default secure configuration",
+      "status": "success",
+      "timestamp": "2026-10-12T20:02:33.475Z"
+    }
+  ]
+}
